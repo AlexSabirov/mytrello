@@ -1,24 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import { TodoList } from './components/TodoList';
+import { ITodo } from './types/data'
 
-function App() {
+const App: React.FC = () => {
+  const [value, setValue] = useState('');
+  const [todos, setTodos] = useState<ITodo[]>([]);
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === 'Enter') addTodo();
+  }
+
+  const addTodo = () => {
+    if (value) {
+      setTodos([...todos, {
+        id: Date.now(),
+        title: value
+      }])
+      setValue('')
+    }
+  }
+
+  const removeTodo = (id: number): void => {
+    setTodos(todos.filter(todo => todo.id !== id))
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <div>
+        <input value={value} onChange={e => setValue(e.target.value)} onKeyDown={handleKeyDown} />
+        <button onClick={addTodo}>Добавить</button>
+      </div>
+      <TodoList items={todos} removeTodo={removeTodo} />
     </div>
   );
 }
