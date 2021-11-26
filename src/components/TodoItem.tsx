@@ -7,8 +7,10 @@ interface ITodoItem extends ITodo {
 const TodoItem: React.FC<ITodoItem> = (props) => {
 	const { id, title, removeTodo } = props;
 
-	return <div>
+	return <div className='board__item'>
+		<div>
 		{title}
+		</div>
 		<button onClick={() => removeTodo(id)}>X</button>
 	</div>
 }

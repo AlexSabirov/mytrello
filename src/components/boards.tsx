@@ -25,9 +25,9 @@ const Boards: React.FC = () => {
   };
 
 	return <div className='app__board'>
-    <div>
-        <input value={value} onChange={e => setValue(e.target.value)} onKeyDown={handleKeyDown} />
-        <button onClick={addTodo}>Добавить</button>
+    <div className='board__buttons'>
+        <input value={value} onChange={e => setValue(e.target.value)} onKeyDown={handleKeyDown} className='board__input' />
+        <button onClick={addTodo} className='board__button'>Добавить</button>
       </div>
       <TodoList items={todos} removeTodo={removeTodo} />
   </div>
