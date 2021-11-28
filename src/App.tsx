@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Boards } from './components/boards';
+import { Card } from './components/card/card';
 
 const App: React.FC = () => {
 
   return (
     <div className="app">
-      <Boards />
-      <Boards />
-      <Boards />
-      <Boards />
+      <Card />
+      <Card />
+      <Card />
+      <Card />
     </div>
   );
 }

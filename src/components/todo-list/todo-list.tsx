@@ -1,13 +1,13 @@
-import { TodoItem } from "./TodoItem"
+import { TodoItem } from "../todo-item/todo-item"
 
-import { ITodo } from '../types/data'
+import { Todo } from '../../types/data'
 
-interface ITodoListProps {
-	items: ITodo[];
+interface TodoListProps {
+	items: Todo[];
 	removeTodo: (id: number) => void;
 }
 
-const TodoList: React.FC<ITodoListProps> = (props) => {
+const TodoList: React.FC<TodoListProps> = (props) => {
 	const { items, removeTodo } = props;
 
 	return <div>

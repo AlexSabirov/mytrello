@@ -1,6 +1,6 @@
-import { ITodo } from '../types/data'
+import { Todo } from '../../types/data'
 
-interface ITodoItem extends ITodo {
+interface ITodoItem extends Todo {
 	removeTodo: (id: number) => void;
 }
 

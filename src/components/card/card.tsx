@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { TodoList } from './TodoList';
-import { ITodo } from '../types/data'
+import { TodoList } from '../todo-list/todo-list';
+import { Todo } from '../../types/data'
 
-const Boards: React.FC = () => {
+const Card: React.FC = () => {
   const [value, setValue] = useState('');
-  const [todos, setTodos] = useState<ITodo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') addTodo();
@@ -33,4 +33,4 @@ const Boards: React.FC = () => {
   </div>
 }
 
-export { Boards }
+export { Card }
