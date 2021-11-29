@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card } from './components/card/card';
+import Card from './components/card';
 import styled, {createGlobalStyle} from 'styled-components';
 
 const Global = createGlobalStyle`

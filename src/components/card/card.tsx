@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TodoList } from '../todo-list/todo-list';
+import TodoList from '../todo-list';
 import { Todo } from '../../types/data'
 import styled from 'styled-components';
 

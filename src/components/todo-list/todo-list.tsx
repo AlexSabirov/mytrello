@@ -1,4 +1,4 @@
-import { TodoItem } from "../todo-item/todo-item"
+import TodoItem from "../todo-item/"
 
 import { Todo } from '../../types/data'
 
