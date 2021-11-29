@@ -1,18 +1,25 @@
-import { Todo } from '../../types/data'
+import { Todo } from '../../types/data';
+import styled from 'styled-components';
 
-interface ITodoItem extends Todo {
+const TodoItemWrapper = styled.div`
+display: flex;
+justify-content: space-between;
+margin-bottom: 5px;
+`
+
+interface TodoItemProps extends Todo {
 	removeTodo: (id: number) => void;
 }
 
-const TodoItem: React.FC<ITodoItem> = (props) => {
+const TodoItem: React.FC<TodoItemProps> = (props) => {
 	const { id, title, removeTodo } = props;
 
-	return <div className='board__item'>
+	return <TodoItemWrapper>
 		<div>
 		{title}
 		</div>
 		<button onClick={() => removeTodo(id)}>X</button>
-	</div>
+	</TodoItemWrapper>
 }
 
 export { TodoItem }
