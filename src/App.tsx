@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Card from './components/card';
 import styled, {createGlobalStyle} from 'styled-components';
+import Modal from './components/modal';
 
 const Global = createGlobalStyle`
 * {
@@ -16,6 +17,8 @@ align-items: flex-start;
 `
 
 const App: React.FC = () => {
+	const [isModal, setModal] = React.useState(true)
+	const onClose = () => setModal(false)
 
   return (
     <>
@@ -25,6 +28,11 @@ const App: React.FC = () => {
       <Card />
       <Card />
       <Card />
+		<Modal
+        visible={isModal}
+        title='Введите ваше имя:'
+        onClose={onClose}
+      />
     </AppWrapper>
     </>
   );

@@ -60,8 +60,8 @@ const Card: React.FC = () => {
 
 	return <CardWrapper>
     <CardButtonsWrapper>
-        <CardInput value={value} onChange={e => setValue(e.target.value)} onKeyDown={handleKeyDown} className='board__input' />
-        <CardButton onClick={addTodo} className='board__button'>Добавить</CardButton>
+        <CardInput value={value} onChange={e => setValue(e.target.value)} onKeyDown={handleKeyDown}/>
+        <CardButton onClick={addTodo}>Добавить</CardButton>
       </CardButtonsWrapper>
       <TodoList items={todos} removeTodo={removeTodo} />
   </CardWrapper>
