@@ -28,16 +28,16 @@ const ModalClose = styled.div`
 `;
 
 const Modal = ({ visible = true, title = '', onClose }: ModalProps) => {
-  const [name, setName] = useState('');
+  const [name, setName] = useState('Гость');
 
-  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') addName();
-  };
+  // const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+  //   if (e.key === 'Enter') addName();
+  // };
 
-  const addName = () => {
-    if (name) {
-    }
-  };
+  // const addName = () => {
+  //   if (name) {
+  //   }
+  // };
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -61,7 +61,7 @@ const Modal = ({ visible = true, title = '', onClose }: ModalProps) => {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          onKeyDown={handleKeyDown}
+          // onKeyDown={handleKeyDown}
         />
         <ModalClose onClick={onClose}>X</ModalClose>
       </ModalContent>

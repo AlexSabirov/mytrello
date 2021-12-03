@@ -12,6 +12,7 @@ const CardWrapper = styled.div`
   max-width: 33%;
   background-color: rgb(202, 202, 202);
   border-radius: 5px;
+  min-width: 240px;
 `;
 
 const CardButtonsWrapper = styled.div`
@@ -38,7 +39,7 @@ const CardButton = styled.button`
   }
 `;
 
-const Card: React.FC = () => {
+const CardItem: React.FC = () => {
   const [value, setValue] = useState('');
   const [todos, setTodos] = useState<Todo[]>([]);
 
@@ -78,4 +79,4 @@ const Card: React.FC = () => {
   );
 };
 
-export { Card };
+export { CardItem };

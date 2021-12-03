@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import React from 'react';
+import { createGlobalStyle } from 'styled-components';
 
-import Card from './components/card';
+import Board from './components/board';
 import Modal from './components/modal';
 
 const Global = createGlobalStyle`
@@ -12,12 +12,6 @@ const Global = createGlobalStyle`
 }
 `;
 
-const AppWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-`;
-
 const App: React.FC = () => {
   const [isModal, setModal] = React.useState(true);
   const onClose = () => setModal(false);
@@ -25,13 +19,10 @@ const App: React.FC = () => {
   return (
     <>
       <Global />
-      <AppWrapper>
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+      <div>
+        <Board />
         <Modal visible={isModal} title="Введите ваше имя:" onClose={onClose} />
-      </AppWrapper>
+      </div>
     </>
   );
 };
