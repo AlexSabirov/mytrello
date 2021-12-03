@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Todo } from '../../types/data';
+import { Card } from '../../types/data';
 import TodoList from '../todo-list';
 
 const CardWrapper = styled.div`
@@ -13,6 +14,11 @@ const CardWrapper = styled.div`
   background-color: rgb(202, 202, 202);
   border-radius: 5px;
   min-width: 240px;
+`;
+
+const CardTitle = styled.div`
+  padding: 10px 5px;
+  font-size: 26px;
 `;
 
 const CardButtonsWrapper = styled.div`
@@ -39,7 +45,12 @@ const CardButton = styled.button`
   }
 `;
 
-const CardItem: React.FC = () => {
+interface CardItemProps extends Todo, Card {
+  removeTodo: (id: number) => void;
+}
+
+const CardItem: React.FC<CardItemProps> = (props) => {
+  const { titleCard } = props;
   const [value, setValue] = useState('');
   const [todos, setTodos] = useState<Todo[]>([]);
 
@@ -67,6 +78,7 @@ const CardItem: React.FC = () => {
   return (
     <CardWrapper>
       <CardButtonsWrapper>
+        <CardTitle>{titleCard}</CardTitle>
         <CardInput
           value={value}
           onChange={(e) => setValue(e.target.value)}

@@ -18,7 +18,14 @@ const CardList: React.FC<CardListProps> = (props) => {
   return (
     <CardListWrapper>
       {items.map((card) => (
-        <CardItem key={card.id} {...card} />
+        <CardItem
+          removeTodo={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+          title={''}
+          key={card.id}
+          {...card}
+        />
       ))}
     </CardListWrapper>
   );

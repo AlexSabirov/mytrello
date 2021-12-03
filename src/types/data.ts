@@ -5,7 +5,7 @@ export interface Todo {
 
 export interface Card {
   id: number;
-  title: string;
+  titleCard: string;
 }
 
 export interface ModalProps {

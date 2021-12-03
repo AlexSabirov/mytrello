@@ -17,7 +17,7 @@ const Board = () => {
         ...cards,
         {
           id: Date.now(),
-          title: value,
+          titleCard: value,
         },
       ]);
       setValue('');
