@@ -16,7 +16,7 @@ const Board = () => {
       setCards([
         ...cards,
         {
-          id: Date.now(),
+          idCard: Date.now(),
           titleCard: value,
         },
       ]);
@@ -24,9 +24,13 @@ const Board = () => {
     }
   };
 
+  const removeCard = (id: number): void => {
+    setCards(cards.filter((card) => card.idCard !== id));
+  };
+
   return (
     <div>
-      <CardList items={cards} />
+      <CardList items={cards} removeCard={removeCard} />
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}

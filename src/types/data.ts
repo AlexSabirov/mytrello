@@ -4,7 +4,7 @@ export interface Todo {
 }
 
 export interface Card {
-  id: number;
+  idCard: number;
   titleCard: string;
 }
 

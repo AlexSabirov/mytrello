@@ -47,10 +47,11 @@ const CardButton = styled.button`
 
 interface CardItemProps extends Todo, Card {
   removeTodo: (id: number) => void;
+  removeCard: (idCard: number) => void;
 }
 
 const CardItem: React.FC<CardItemProps> = (props) => {
-  const { titleCard } = props;
+  const { id, titleCard, removeCard } = props;
   const [value, setValue] = useState('');
   const [todos, setTodos] = useState<Todo[]>([]);
 
@@ -87,6 +88,7 @@ const CardItem: React.FC<CardItemProps> = (props) => {
         <CardButton onClick={addTodo}>Добавить</CardButton>
       </CardButtonsWrapper>
       <TodoList items={todos} removeTodo={removeTodo} />
+      <button onClick={() => removeCard(id)}>Удалить карточку</button>
     </CardWrapper>
   );
 };
