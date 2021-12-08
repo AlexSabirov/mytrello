@@ -13,3 +13,9 @@ export interface Modal {
   title: string;
   onClose: () => void;
 }
+
+export interface Comment {
+  id: number;
+  userName: string;
+  comment: string;
+}

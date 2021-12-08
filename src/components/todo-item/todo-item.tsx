@@ -25,7 +25,17 @@ const TodoItem: React.FC<TodoItemProps> = (props) => {
     <TodoItemWrapper>
       <div onClick={onOpen}>{title}</div>
       <button onClick={() => removeTodo(id)}>X</button>
-      <CommentsWindow visible={isModalComment} title="Комментарии:" onClose={onClose} />
+      <CommentsWindow
+        visible={isModalComment}
+        title="Комментарии:"
+        onClose={onClose}
+        removeComment={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+        id={0}
+        userName={''}
+        comment={''}
+      />
     </TodoItemWrapper>
   );
 };
