@@ -8,7 +8,7 @@ export interface Card {
   titleCard: string;
 }
 
-export interface ModalProps {
+export interface Modal {
   visible: boolean;
   title: string;
   onClose: () => void;

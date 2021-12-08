@@ -2,7 +2,7 @@ import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
 import Board from './components/board';
-import Modal from './components/modal';
+import ModalWindow from './components/modal';
 
 const Global = createGlobalStyle`
 * {
@@ -21,7 +21,7 @@ const App: React.FC = () => {
       <Global />
       <div>
         <Board />
-        <Modal visible={isModal} title="Введите ваше имя:" onClose={onClose} />
+        <ModalWindow visible={isModal} title="Введите ваше имя:" onClose={onClose} />
       </div>
     </>
   );

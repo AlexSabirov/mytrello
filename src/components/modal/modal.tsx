@@ -2,9 +2,9 @@ import React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import { ModalProps } from '../../types/data';
+import { Modal } from '../../types/data';
 
-const ModalWindow = styled.div`
+const ModalWrapper = styled.div`
   position: fixed;
   width: 100%;
   height: 100%;
@@ -27,7 +27,7 @@ const ModalClose = styled.div`
   cursor: pointer;
 `;
 
-const Modal = ({ visible = true, title = '', onClose }: ModalProps) => {
+const ModalWindow = ({ visible = true, title = '', onClose }: Modal) => {
   const [name, setName] = useState('Гость');
 
   // const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
@@ -55,7 +55,7 @@ const Modal = ({ visible = true, title = '', onClose }: ModalProps) => {
   if (!visible) return null;
 
   return (
-    <ModalWindow onClick={onClose}>
+    <ModalWrapper onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
         <input
@@ -65,8 +65,8 @@ const Modal = ({ visible = true, title = '', onClose }: ModalProps) => {
         />
         <ModalClose onClick={onClose}>X</ModalClose>
       </ModalContent>
-    </ModalWindow>
+    </ModalWrapper>
   );
 };
 
-export { Modal };
+export { ModalWindow };

@@ -1,3 +1,3 @@
-import { Modal } from './modal';
+import { ModalWindow } from './modal';
 
-export default Modal;
+export default ModalWindow;
