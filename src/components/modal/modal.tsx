@@ -27,17 +27,9 @@ const ModalClose = styled.div`
   cursor: pointer;
 `;
 
-const ModalWindow = ({ visible = true, title = '', onClose }: Modal) => {
-  const [name, setName] = useState('Гость');
-
-  // const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-  //   if (e.key === 'Enter') addName();
-  // };
-
-  // const addName = () => {
-  //   if (name) {
-  //   }
-  // };
+const ModalWindow: React.FC<Modal> = (props) => {
+  const { visible = true, title = '', onClose } = props;
+  const [userName, setUserName] = useState('Гость');
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -58,11 +50,7 @@ const ModalWindow = ({ visible = true, title = '', onClose }: Modal) => {
     <ModalWrapper onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          // onKeyDown={handleKeyDown}
-        />
+        <input value={userName} onChange={(e) => setUserName(e.target.value)} />
         <ModalClose onClick={onClose}>X</ModalClose>
       </ModalContent>
     </ModalWrapper>
