@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Card } from '../../types/data';
+import { Board, Card } from '../../types/data';
 import CardList from '../card-list';
 
 const Board = () => {

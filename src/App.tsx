@@ -3,6 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import Board from './components/board';
 import ModalWindow from './components/modal';
+import BoardProvider from './providers/board/board-providers';
 
 const Global = createGlobalStyle`
 * {
@@ -20,8 +21,10 @@ const App: React.FC = () => {
     <>
       <Global />
       <div>
-        <Board />
-        <ModalWindow visible={isModal} title="Введите ваше имя:" onClose={onClose} />
+        <BoardProvider>
+          <Board />
+          <ModalWindow visible={isModal} title="Введите ваше имя:" onClose={onClose} />
+        </BoardProvider>
       </div>
     </>
   );

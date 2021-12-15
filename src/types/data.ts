@@ -19,3 +19,22 @@ export interface Comment {
   userName: string;
   comment: string;
 }
+
+export interface Board {
+  user: string;
+  cards: {
+    [key: string]: {
+      id: string;
+      name: string;
+      todos: {
+        todo: {
+          id: string;
+          name: string;
+          comments: {
+            comment: string;
+          };
+        };
+      };
+    };
+  };
+}
