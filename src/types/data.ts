@@ -1,11 +1,13 @@
 export interface Todo {
-  id: number;
+  id: string;
   title: string;
+  comments: Record<string, Comment>;
 }
 
 export interface Card {
-  idCard: number;
-  titleCard: string;
+  id: string;
+  title: string;
+  todos: Record<string, Todo>;
 }
 
 export interface Modal {
@@ -15,26 +17,12 @@ export interface Modal {
 }
 
 export interface Comment {
-  id: number;
-  userName: string;
+  id: string;
+  user: string;
   comment: string;
 }
 
 export interface Board {
   user: string;
-  cards: {
-    [key: string]: {
-      id: string;
-      name: string;
-      todos: {
-        todo: {
-          id: string;
-          name: string;
-          comments: {
-            comment: string;
-          };
-        };
-      };
-    };
-  };
+  cards: Record<string, Card>;
 }

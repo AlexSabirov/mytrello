@@ -1,11 +1,13 @@
 import { useEffect, useReducer } from 'react';
 
-import reducer, { init, initialState } from '../../components/reducer/reducer';
 import { BoardContext } from '../../context/board/board-context';
+import { init } from '../../store/init';
+import reducer from '../../store/reducer';
+import { initialState } from '../../store/state';
 
 const BoardProvider: React.FC = ({ children }) => {
   const stateAndDispatch = useReducer(reducer, initialState, init);
-  const [state, dispatch] = stateAndDispatch;
+  const [state] = stateAndDispatch;
 
   useEffect(() => {
     localStorage.setItem('trello', JSON.stringify(state));
