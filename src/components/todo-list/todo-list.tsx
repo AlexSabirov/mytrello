@@ -1,19 +1,19 @@
-import { Todo } from '../../types/data';
+import { useContext } from 'react';
+
+import { BoardContext } from '../../context/board/board-context';
 import TodoItem from '../todo-item/';
 
-interface TodoListProps {
-  items: Todo[];
-  removeTodo: (id: number) => void;
-}
-
-const TodoList: React.FC<TodoListProps> = (props) => {
-  const { items, removeTodo } = props;
-
+const TodoList: React.FC = () => {
+  const [state] = useContext(BoardContext);
   return (
     <div>
-      {items.map((todo) => (
-        <TodoItem key={todo.id} removeTodo={removeTodo} {...todo} />
-      ))}
+      {() => {
+        for (const key in state.cards.card.todos) {
+          <TodoItem>
+            <h4>{state.cards.card.todos[key]}</h4>
+          </TodoItem>;
+        }
+      }}
     </div>
   );
 };

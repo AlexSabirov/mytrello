@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { v4 } from 'uuid';
 
-import { Todo } from '../../types/data';
+import { BoardContext } from '../../context/board/board-context';
+import { BoardActionTypes } from '../../store/actions-type';
 import CommentsWindow from '../comments-window';
 
 const TodoItemWrapper = styled.div`
@@ -10,12 +12,8 @@ const TodoItemWrapper = styled.div`
   margin-bottom: 5px;
 `;
 
-interface TodoItemProps extends Todo {
-  removeTodo: (id: number) => void;
-}
-
-const TodoItem: React.FC<TodoItemProps> = (props) => {
-  const { id, title, removeTodo } = props;
+const TodoItem: React.FC = () => {
+  const [state, dispatch] = useContext(BoardContext);
 
   const [isModalComment, setModalComment] = React.useState(false);
   const onOpen = () => setModalComment(true);
@@ -23,8 +21,12 @@ const TodoItem: React.FC<TodoItemProps> = (props) => {
 
   return (
     <TodoItemWrapper>
-      <div onClick={onOpen}>{title}</div>
-      <button onClick={() => removeTodo(id)}>X</button>
+      <div onClick={onOpen}>{state.cards.card.todos?.todo.title || ''}</div>
+      <button
+        onClick={() => dispatch({ type: BoardActionTypes.RemoveTodo, payload: state })}
+      >
+        X
+      </button>
       <CommentsWindow
         visible={isModalComment}
         title="Комментарии:"
@@ -32,9 +34,8 @@ const TodoItem: React.FC<TodoItemProps> = (props) => {
         removeComment={function (): void {
           throw new Error('Function not implemented.');
         }}
-        id={0}
-        userName={''}
-        comment={''}
+        id={v4()}
+        user={state.user}
       />
     </TodoItemWrapper>
   );

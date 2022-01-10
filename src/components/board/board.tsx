@@ -1,42 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 
-import { Board, Card } from '../../types/data';
+import { BoardContext } from '../../context/board/board-context';
+import { BoardActionTypes } from '../../store/actions-type';
+import { Board } from '../../types/data';
 import CardList from '../card-list';
 
 const Board = () => {
-  const [value, setValue] = useState('');
-  const [cards, setCards] = useState<Card[]>([]);
+  const [state, dispatch] = useContext(BoardContext);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') addCard();
-  };
-
-  const addCard = () => {
-    if (value) {
-      setCards([
-        ...cards,
-        {
-          idCard: Date.now(),
-          titleCard: value,
-        },
-      ]);
-      setValue('');
-    }
-  };
-
-  const removeCard = (id: number): void => {
-    setCards(cards.filter((card) => card.idCard !== id));
+    if (e.key === 'Enter') dispatch({ type: BoardActionTypes.AddCard, payload: state });
   };
 
   return (
     <div>
-      <CardList items={cards} removeCard={removeCard} />
+      <CardList />
       <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
+        value={state.cards.card.title}
+        onChange={() => dispatch({ type: BoardActionTypes.AddCard, payload: state })}
         onKeyDown={handleKeyDown}
       />
-      <button onClick={addCard}>Add Card</button>
+      <button
+        onClick={() => dispatch({ type: BoardActionTypes.AddCard, payload: state })}
+      >
+        Add Card
+      </button>
     </div>
   );
 };

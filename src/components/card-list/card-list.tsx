@@ -1,6 +1,7 @@
+import { useContext } from 'react';
 import styled from 'styled-components';
 
-import { Card } from '../../types/data';
+import { BoardContext } from '../../context/board/board-context';
 import CardItem from '../card-item/';
 
 const CardListWrapper = styled.div`
@@ -9,28 +10,17 @@ const CardListWrapper = styled.div`
   align-items: flex-start;
 `;
 
-interface CardListProps {
-  items: Card[];
-  removeCard: (idCard: number) => void;
-}
-
-const CardList: React.FC<CardListProps> = (props) => {
-  const { items, removeCard } = props;
-
+const CardList: React.FC = () => {
+  const [state] = useContext(BoardContext);
   return (
     <CardListWrapper>
-      {items.map((card) => (
-        <CardItem
-          id={card.idCard}
-          removeTodo={function (): void {
-            throw new Error('Function not implemented.');
-          }}
-          title={''}
-          key={card.idCard}
-          removeCard={removeCard}
-          {...card}
-        />
-      ))}
+      {() => {
+        for (const key in state.cards) {
+          <CardItem>
+            <h4>{state.cards[key].title}</h4>
+          </CardItem>;
+        }
+      }}
     </CardListWrapper>
   );
 };

@@ -1,19 +1,19 @@
-import { Comment } from '../../types/data';
+import { useContext } from 'react';
+
+import { BoardContext } from '../../context/board/board-context';
 import CommentItem from '../comment-item';
 
-interface CommentsListProps {
-  items: Comment[];
-  removeComment: (id: number) => void;
-}
-
-const CommentsList: React.FC<CommentsListProps> = (props) => {
-  const { items, removeComment } = props;
-
+const CommentsList: React.FC = () => {
+  const [state] = useContext(BoardContext);
   return (
     <div>
-      {items.map((comment) => (
-        <CommentItem key={comment.id} removeComment={removeComment} {...comment} />
-      ))}
+      {() => {
+        for (const key in state.cards.card.todos) {
+          <CommentItem>
+            <h4>{state.cards.card.todos[key].title}</h4>
+          </CommentItem>;
+        }
+      }}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { Board } from '../types/data';
 export const initialState: Board = {
   user: 'Гость',
   cards: {
-    card1: {
+    card: {
       id: v4(),
       title: 'My card 1',
       todos: {

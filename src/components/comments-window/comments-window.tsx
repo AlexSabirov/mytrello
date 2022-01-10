@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
+import { BoardContext } from '../../context/board/board-context';
+import { BoardActionTypes } from '../../store/actions-type';
 import { Comment } from '../../types/data';
 import { Modal } from '../../types/data';
 import CommentsList from '../comments-list';
@@ -24,35 +26,16 @@ const ModalWindowContent = styled.div`
   background-color: gray;
 `;
 
-interface CommentsWindowProps extends Comment, Modal {
-  removeComment: (id: number) => void;
-}
+interface CommentsWindowProps extends Comment, Modal {}
 
 const CommentsWindow: React.FC<CommentsWindowProps> = (props) => {
   const { visible = false, title = '', onClose } = props;
-  const [value, setValue] = useState('');
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [state, dispatch] = useContext(BoardContext);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') addComment();
-  };
-
-  const addComment = () => {
-    if (value) {
-      setComments([
-        ...comments,
-        {
-          id: Date.now(),
-          userName: 'Гость',
-          comment: value,
-        },
-      ]);
-      setValue('');
+    if (e.key === 'Enter') {
+      dispatch({ type: BoardActionTypes.AddComment, payload: state });
     }
-  };
-
-  const removeComment = (id: number): void => {
-    setComments(comments.filter((comment) => comment.id !== id));
   };
 
   const onKeydown = ({ key }: KeyboardEvent) => {
@@ -75,13 +58,17 @@ const CommentsWindow: React.FC<CommentsWindowProps> = (props) => {
       <ModalWindowContent onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
         <input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={state.cards.card.todos?.todo.comments?.comment.comment || ''}
+          onChange={() => dispatch({ type: BoardActionTypes.AddComment, payload: state })}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={addComment}>Добавить</button>
+        <button
+          onClick={() => dispatch({ type: BoardActionTypes.AddComment, payload: state })}
+        >
+          Добавить
+        </button>
         <div onClick={onClose}>X</div>
-        <CommentsList items={comments} removeComment={removeComment} />
+        <CommentsList />
       </ModalWindowContent>
     </ModalWindowWrapper>
   );

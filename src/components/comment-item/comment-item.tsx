@@ -1,16 +1,20 @@
-import { Comment } from '../../types/data';
+import { useContext } from 'react';
 
-interface CommentItemProps extends Comment {
-  removeComment: (id: number) => void;
-}
+import { BoardContext } from '../../context/board/board-context';
+import { BoardActionTypes } from '../../store/actions-type';
 
-const CommentItem: React.FC<CommentItemProps> = (props) => {
-  const { id, userName, comment, removeComment } = props;
+const CommentItem: React.FC = () => {
+  const [state, dispatch] = useContext(BoardContext);
+
   return (
     <div>
-      <div>{userName}</div>
-      <div>{comment}</div>
-      <button onClick={() => removeComment(id)}>X</button>
+      <div>{state.user}</div>
+      <div>{state.cards.card.todos?.todo.comments?.comment}</div>
+      <button
+        onClick={() => dispatch({ type: BoardActionTypes.RemoveComment, payload: state })}
+      >
+        X
+      </button>
     </div>
   );
 };

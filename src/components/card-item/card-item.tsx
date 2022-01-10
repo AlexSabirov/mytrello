@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 
-import { Todo } from '../../types/data';
-import { Card } from '../../types/data';
+import { BoardContext } from '../../context/board/board-context';
+import { BoardActionTypes } from '../../store/actions-type';
 import TodoList from '../todo-list';
 
 const CardWrapper = styled.div`
@@ -45,50 +45,34 @@ const CardButton = styled.button`
   }
 `;
 
-interface CardItemProps extends Todo, Card {
-  removeTodo: (id: number) => void;
-  removeCard: (idCard: number) => void;
-}
-
-const CardItem: React.FC<CardItemProps> = (props) => {
-  const { id, titleCard, removeCard } = props;
-  const [value, setValue] = useState('');
-  const [todos, setTodos] = useState<Todo[]>([]);
+const CardItem: React.FC = () => {
+  const [state, dispatch] = useContext(BoardContext);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') addTodo();
-  };
-
-  const addTodo = () => {
-    if (value) {
-      setTodos([
-        ...todos,
-        {
-          id: Date.now(),
-          title: value,
-        },
-      ]);
-      setValue('');
-    }
-  };
-
-  const removeTodo = (id: number): void => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+    if (e.key === 'Enter') dispatch({ type: BoardActionTypes.AddTodo, payload: state });
   };
 
   return (
     <CardWrapper>
       <CardButtonsWrapper>
-        <CardTitle>{titleCard}</CardTitle>
+        <CardTitle>{state.cards.card.title}</CardTitle>
         <CardInput
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
+          value={state.cards.card.todos?.todos.title || ''}
+          onChange={() => dispatch({ type: BoardActionTypes.AddTodo, payload: state })}
           onKeyDown={handleKeyDown}
         />
-        <CardButton onClick={addTodo}>Добавить</CardButton>
+        <CardButton
+          onClick={() => dispatch({ type: BoardActionTypes.AddTodo, payload: state })}
+        >
+          Добавить
+        </CardButton>
       </CardButtonsWrapper>
-      <TodoList items={todos} removeTodo={removeTodo} />
-      <button onClick={() => removeCard(id)}>Удалить карточку</button>
+      <TodoList />
+      <button
+        onClick={() => dispatch({ type: BoardActionTypes.RemoveCard, payload: state })}
+      >
+        Удалить карточку
+      </button>
     </CardWrapper>
   );
 };
