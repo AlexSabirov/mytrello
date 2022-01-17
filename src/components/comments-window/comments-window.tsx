@@ -58,6 +58,7 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
     <ModalWindowWrapper onClick={onClose}>
       <ModalWindowContent onClick={(e) => e.stopPropagation()}>
         <CommentInputWrapper>
+          <p>Ваш комментарий:</p>
           <CommentInput
             value={value}
             onChange={(e) => setValue(() => e.target.value)}
@@ -74,6 +75,7 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
 
 const ModalWindowWrapper = styled.div`
   position: fixed;
+  z-index: 10;
   width: 100%;
   height: 100%;
   top: 0;

@@ -80,8 +80,11 @@ const CardItemWrapper = styled.div`
   display: flex;
 `;
 
-const CardItemTitle = styled.div`
+const CardItemTitle = styled.p`
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const CardItemButtons = styled.div`
