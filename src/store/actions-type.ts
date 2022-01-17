@@ -1,5 +1,3 @@
-import { Card, Columns, Comment } from '../types/data';
-
 export type BoardAction = ColumnAction | CardAction | CommentAction | UserAction;
 
 export enum BoardActionTypes {
@@ -22,12 +20,12 @@ interface ColumnAddAction {
 
 interface ColumnUpdateAction {
   type: BoardActionTypes.UpdateColumn;
-  payload: Columns;
+  payload: { title: string; columnId: string };
 }
 
 interface ColumnRemoveAction {
   type: BoardActionTypes.RemoveColumn;
-  payload: Columns;
+  payload: { columnId: string };
 }
 
 type ColumnAction = ColumnAddAction | ColumnUpdateAction | ColumnRemoveAction;
@@ -39,29 +37,29 @@ interface CardAddAction {
 
 interface CardUpdateAction {
   type: BoardActionTypes.UpdateCard;
-  payload: Card;
+  payload: { title: string; columnId: string; cardId: string };
 }
 
 interface CardRemoveAction {
   type: BoardActionTypes.RemoveCard;
-  payload: Card;
+  payload: { columnId: string; cardId: string };
 }
 
 type CardAction = CardAddAction | CardUpdateAction | CardRemoveAction;
 
 interface CommentAddAction {
   type: BoardActionTypes.AddComment;
-  payload: { comment: string; columnId: string; cardId: string };
+  payload: { title: string; columnId: string; cardId: string };
 }
 
 interface CommentUpdateAction {
   type: BoardActionTypes.UpdateComment;
-  payload: Comment;
+  payload: { title: string; columnId: string; cardId: string; commentId: string };
 }
 
 interface CommentRemoveAction {
   type: BoardActionTypes.RemoveComment;
-  payload: Comment;
+  payload: { columnId: string; cardId: string; commentId: string };
 }
 
 type CommentAction = CommentAddAction | CommentUpdateAction | CommentRemoveAction;

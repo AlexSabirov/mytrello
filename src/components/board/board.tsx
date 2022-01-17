@@ -1,26 +1,32 @@
-import { useCallback, useContext, useState } from 'react';
+import { FC, KeyboardEventHandler, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 
 import { BoardContext } from '../../context/board/board-context';
 import { BoardActionTypes } from '../../store/actions-type';
-import { Board } from '../../types/data';
 import ColumnList from '../column-list';
 
-const BoardWrapper = styled.div`
-  padding: 5px;
-`;
-
-const BoardItem: React.FC<Board> = () => {
+const BoardItem: FC = () => {
   const [, dispatch] = useContext(BoardContext);
   const [value, setValue] = useState('');
 
   const addColumn = useCallback(() => {
     dispatch({ type: BoardActionTypes.AddColumn, payload: { title: value } });
   }, [value, dispatch]);
+  const clearInput = () => {
+    setValue('');
+  };
 
-  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+  const addColumnAndClearInput = () => {
+    if (value === '') {
+      return;
+    }
+    addColumn();
+    clearInput();
+  };
+
+  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      addColumn();
+      addColumnAndClearInput();
     }
   };
 
@@ -32,9 +38,13 @@ const BoardItem: React.FC<Board> = () => {
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <button onClick={addColumn}>Add Column</button>
+      <button onClick={addColumnAndClearInput}>Add Column</button>
     </BoardWrapper>
   );
 };
+
+const BoardWrapper = styled.div`
+  padding: 5px;
+`;
 
 export default BoardItem;

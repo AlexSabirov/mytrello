@@ -19,7 +19,7 @@ export const initialState: Board = {
           comments: {
             [commentId]: {
               id: commentId,
-              comment: '123',
+              title: '123',
             },
           },
         },

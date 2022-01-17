@@ -17,7 +17,7 @@ export interface Card {
 
 export interface Comment {
   id: string;
-  comment: string;
+  title: string;
 }
 
 export interface Modal {
