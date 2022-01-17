@@ -2,21 +2,24 @@ import { v4 } from 'uuid';
 
 import { Board } from '../types/data';
 
+const columnId = v4();
+const cardId = v4();
+const commentId = v4();
+
 export const initialState: Board = {
-  user: 'Гость',
-  cards: {
-    card: {
-      id: v4(),
-      title: 'My card 1',
-      todos: {
-        todo: {
-          id: v4(),
-          title: 'My todo',
+  user: '',
+  columns: {
+    [columnId]: {
+      id: columnId,
+      title: 'My column 1',
+      cards: {
+        [cardId]: {
+          id: cardId,
+          title: 'My card',
           comments: {
-            comment: {
-              id: v4(),
-              user: '',
-              comment: '',
+            [commentId]: {
+              id: commentId,
+              comment: '123',
             },
           },
         },

@@ -1,9 +1,8 @@
-import React, { useContext } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { BoardContext } from '../../context/board/board-context';
 import { BoardActionTypes } from '../../store/actions-type';
-import { Comment } from '../../types/data';
 import { Modal } from '../../types/data';
 import CommentsList from '../comments-list';
 
@@ -26,15 +25,30 @@ const ModalWindowContent = styled.div`
   background-color: gray;
 `;
 
-interface CommentsWindowProps extends Comment, Modal {}
+interface CommentsWindowProps extends Modal {
+  columnId: string;
+  cardId: string;
+}
 
-const CommentsWindow: React.FC<CommentsWindowProps> = (props) => {
-  const { visible = false, title = '', onClose } = props;
-  const [state, dispatch] = useContext(BoardContext);
+const CommentsWindow: React.FC<CommentsWindowProps> = ({
+  columnId,
+  cardId,
+  visible = false,
+  onClose,
+}) => {
+  const [value, setValue] = useState('');
+  const [, dispatch] = useContext(BoardContext);
+
+  const addComment = useCallback(() => {
+    dispatch({
+      type: BoardActionTypes.AddComment,
+      payload: { comment: value, columnId, cardId },
+    });
+  }, [dispatch, value, columnId, cardId]);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      dispatch({ type: BoardActionTypes.AddComment, payload: state });
+      addComment();
     }
   };
 
@@ -46,7 +60,7 @@ const CommentsWindow: React.FC<CommentsWindowProps> = (props) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener('keydown', onKeydown);
     return () => document.removeEventListener('keydown', onKeydown);
   });
@@ -56,19 +70,14 @@ const CommentsWindow: React.FC<CommentsWindowProps> = (props) => {
   return (
     <ModalWindowWrapper onClick={onClose}>
       <ModalWindowContent onClick={(e) => e.stopPropagation()}>
-        <h3>{title}</h3>
         <input
-          value={state.cards.card.todos?.todo.comments?.comment.comment || ''}
-          onChange={() => dispatch({ type: BoardActionTypes.AddComment, payload: state })}
+          value={value}
+          onChange={(e) => setValue(() => e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button
-          onClick={() => dispatch({ type: BoardActionTypes.AddComment, payload: state })}
-        >
-          Добавить
-        </button>
+        <button onClick={addComment}>Добавить комментарий</button>
         <div onClick={onClose}>X</div>
-        <CommentsList />
+        <CommentsList columnId={columnId} cardId={cardId} />
       </ModalWindowContent>
     </ModalWindowWrapper>
   );

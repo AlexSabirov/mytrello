@@ -1,28 +1,23 @@
 import { useContext } from 'react';
-import styled from 'styled-components';
 
 import { BoardContext } from '../../context/board/board-context';
-import CardItem from '../card-item/';
+import CardItem from '../card-item';
 
-const CardListWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-`;
+interface CardListProps {
+  columnId: string;
+}
 
-const CardList: React.FC = () => {
+const CardList: React.FC<CardListProps> = ({ columnId }) => {
   const [state] = useContext(BoardContext);
   return (
-    <CardListWrapper>
-      {() => {
-        for (const key in state.cards) {
-          <CardItem>
-            <h4>{state.cards[key].title}</h4>
-          </CardItem>;
-        }
-      }}
-    </CardListWrapper>
+    <div>
+      {Object.values(state.columns?.[columnId]?.cards || []).map((card) => (
+        <CardItem key={card.id} columnId={columnId} cardId={card.id}>
+          <div>{card.title}</div>
+        </CardItem>
+      ))}
+    </div>
   );
 };
 
-export default CardList;
+export { CardList };

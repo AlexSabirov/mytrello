@@ -3,17 +3,25 @@ import { useContext } from 'react';
 import { BoardContext } from '../../context/board/board-context';
 import CommentItem from '../comment-item';
 
-const CommentsList: React.FC = () => {
+interface CommentsListProps {
+  columnId: string;
+  cardId: string;
+}
+
+const CommentsList: React.FC<CommentsListProps> = ({ columnId, cardId }) => {
   const [state] = useContext(BoardContext);
   return (
     <div>
-      {() => {
-        for (const key in state.cards.card.todos) {
-          <CommentItem>
-            <h4>{state.cards.card.todos[key].title}</h4>
-          </CommentItem>;
-        }
-      }}
+      {Object.values(state.columns[columnId].cards[cardId].comments).map((comment) => (
+        <CommentItem
+          key={comment.id}
+          columnId={columnId}
+          cardId={cardId}
+          commentId={comment.id}
+        >
+          <div>{comment.comment}</div>
+        </CommentItem>
+      ))}
     </div>
   );
 };

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createGlobalStyle } from 'styled-components';
 
-import Board from './components/board';
+import BoardItem from './components/board';
 import ModalWindow from './components/modal';
+import { BoardContext } from './context/board/board-context';
 import BoardProvider from './providers/board/board-providers';
 
 const Global = createGlobalStyle`
@@ -16,14 +17,15 @@ const Global = createGlobalStyle`
 const App: React.FC = () => {
   const [isModal, setModal] = React.useState(true);
   const onClose = () => setModal(false);
+  const [state] = useContext(BoardContext);
 
   return (
     <>
       <Global />
       <div>
         <BoardProvider>
-          <Board />
-          <ModalWindow visible={isModal} title="Введите ваше имя:" onClose={onClose} />
+          <BoardItem user={state.user} columns={state.columns} />
+          <ModalWindow visible={isModal} onClose={onClose} />
         </BoardProvider>
       </div>
     </>

@@ -1,32 +1,40 @@
-import React, { useContext } from 'react';
+import { useCallback, useContext, useState } from 'react';
+import styled from 'styled-components';
 
 import { BoardContext } from '../../context/board/board-context';
 import { BoardActionTypes } from '../../store/actions-type';
 import { Board } from '../../types/data';
-import CardList from '../card-list';
+import ColumnList from '../column-list';
 
-const Board = () => {
-  const [state, dispatch] = useContext(BoardContext);
+const BoardWrapper = styled.div`
+  padding: 5px;
+`;
+
+const BoardItem: React.FC<Board> = () => {
+  const [, dispatch] = useContext(BoardContext);
+  const [value, setValue] = useState('');
+
+  const addColumn = useCallback(() => {
+    dispatch({ type: BoardActionTypes.AddColumn, payload: { title: value } });
+  }, [value, dispatch]);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') dispatch({ type: BoardActionTypes.AddCard, payload: state });
+    if (e.key === 'Enter') {
+      addColumn();
+    }
   };
 
   return (
-    <div>
-      <CardList />
+    <BoardWrapper>
+      <ColumnList />
       <input
-        value={state.cards.card.title}
-        onChange={() => dispatch({ type: BoardActionTypes.AddCard, payload: state })}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <button
-        onClick={() => dispatch({ type: BoardActionTypes.AddCard, payload: state })}
-      >
-        Add Card
-      </button>
-    </div>
+      <button onClick={addColumn}>Add Column</button>
+    </BoardWrapper>
   );
 };
 
-export default Board;
+export default BoardItem;

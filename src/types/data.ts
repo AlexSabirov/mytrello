@@ -1,28 +1,26 @@
 export interface Board {
   user: string;
+  columns: Record<string, Columns>;
+}
+
+export interface Columns {
+  id: string;
+  title: string;
   cards: Record<string, Card>;
 }
 
 export interface Card {
   id: string;
   title: string;
-  todos: Record<string, Todo> | null;
-}
-
-export interface Todo {
-  id: string;
-  title: string | null;
-  comments: Record<string, Comment> | null;
+  comments: Record<string, Comment>;
 }
 
 export interface Comment {
   id: string;
-  user: string;
-  comment: string | null;
+  comment: string;
 }
 
 export interface Modal {
   visible: boolean;
-  title: string;
   onClose: () => void;
 }

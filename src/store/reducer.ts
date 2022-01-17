@@ -5,94 +5,96 @@ import { BoardAction, BoardActionTypes } from './actions-type';
 
 export default function reducer(state: Board, action: BoardAction): Board {
   switch (action.type) {
-    case BoardActionTypes.AddCard:
+    case BoardActionTypes.AddUserName: {
+      return { ...state, ...action.payload };
+    }
+    case BoardActionTypes.AddColumn: {
+      const id = v4();
       return {
         ...state,
-        cards: {
-          ...state.cards,
-          Card: { id: v4(), title: action.payload.cards.card.title, todos: null },
+        columns: {
+          ...state.columns,
+          [id]: { ...action.payload, id, cards: {} },
         },
       };
-    case BoardActionTypes.UpdateCard:
-      for (const key in state.cards) {
-        if (state.cards[key] === action.payload.cards.card) {
-          state.cards[key].title = action.payload.cards.card.title;
-        }
-      }
-      return action.payload;
-    case BoardActionTypes.RemoveCard:
-      for (const key in state.cards) {
-        if (state.cards[key] === action.payload.cards.card) {
-          delete state.cards[key];
-        }
-      }
-      return action.payload;
+    }
+    // case BoardActionTypes.UpdateColumn:
+    //   for (const key in state.cards) {
+    //     if (state.cards[key] === action.payload) {
+    //       state.cards[key].title = action.payload.title;
+    //     }
+    //   }
+    //   return action.payload.title;
+    // case BoardActionTypes.RemoveColumn:
+    //   for (const key in state.cards) {
+    //     if (state.cards[key] === action.payload) {
+    //       delete state.cards[key];
+    //     }
+    //   }
+    //   return action.payload;
 
-    case BoardActionTypes.AddTodo:
+    case BoardActionTypes.AddCard: {
+      const id = v4();
+      const { columnId, ...restPayload } = action.payload;
       return {
         ...state,
-        cards: {
-          ...state.cards,
-          Card: {
-            ...state.cards.id,
-            ...state.cards.title,
-            todos: {
-              ...state.cards.card.todos,
-              todo: {
-                id: v4(),
-                title: action.payload.cards.card.todos?.todos.title || null,
-                comments: null,
-              },
+        columns: {
+          ...state.columns,
+          [columnId]: {
+            ...state.columns[columnId],
+            cards: {
+              ...state.columns[columnId].cards,
+              [id]: { ...restPayload, id, comments: {} },
             },
           },
         },
       };
-    case BoardActionTypes.UpdateTodo:
-      return action.payload;
-    case BoardActionTypes.RemoveTodo:
-      for (const key in state.cards.card.todos) {
-        if (state.cards.card.todos[key] === action.payload.cards.card.todos?.todo) {
-          delete state.cards.card.todos[key];
-        }
-      }
-      return action.payload;
-    case BoardActionTypes.AddComment:
+    }
+    // case BoardActionTypes.UpdateCard:
+    //   return action.payload;
+    // case BoardActionTypes.RemoveCard:
+    //   for (const key in state.cards.card.todos) {
+    //     if (state.cards.card.todos[key] === action.payload.cards.card.todos?.todo) {
+    //       delete state.cards.card.todos[key];
+    //     }
+    //   }
+    //   return action.payload;
+
+    case BoardActionTypes.AddComment: {
+      const id = v4();
+      const { columnId, cardId, ...restPayload } = action.payload;
       return {
         ...state,
-        cards: {
-          ...state.cards,
-          Card: {
-            ...state.cards.id,
-            todos: {
-              ...state.cards.card.todos,
-              todo: {
-                ...state.cards.todos,
+        columns: {
+          ...state.columns,
+          [columnId]: {
+            ...state.columns[columnId],
+            cards: {
+              [cardId]: {
+                ...state.columns[columnId].cards[cardId],
                 comments: {
-                  ...state.cards.card.todos?.todo.comments,
-                  comment: {
-                    id: v4(),
-                    user: state.user,
-                    comment:
-                      state.cards.card.todos?.todo.comments?.comment.comment || null,
-                  },
+                  ...state.columns[columnId].cards[cardId].comments,
+                  [id]: { ...restPayload, id },
                 },
               },
             },
           },
         },
       };
-    case BoardActionTypes.UpdateComment:
-      return action.payload;
-    case BoardActionTypes.RemoveComment:
-      for (const key in state.cards.card.todos?.todo.comments) {
-        if (
-          state.cards.card.todos?.todo.comments[key] ===
-          action.payload.cards.card.todos?.todo.comments?.comment
-        ) {
-          delete state.cards.card.todos?.todo.comments[key];
-        }
-      }
-      return action.payload;
+    }
+
+    // case BoardActionTypes.UpdateComment:
+    //   return action.payload;
+    // case BoardActionTypes.RemoveComment:
+    //   for (const key in state.cards.card.todos?.todo.comments) {
+    //     if (
+    //       state.cards.card.todos?.todo.comments[key] ===
+    //       action.payload.cards.card.todos?.todo.comments?.comment
+    //     ) {
+    //       delete state.cards.card.todos?.todo.comments[key];
+    //     }
+    //   }
+    //   return action.payload;
     default:
       return state;
   }
