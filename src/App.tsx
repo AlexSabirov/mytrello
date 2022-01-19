@@ -9,12 +9,10 @@ const App: FC = () => {
   return (
     <>
       <Global />
-      <div>
-        <BoardProvider>
-          <BoardItem />
-          <ModalWindow />
-        </BoardProvider>
-      </div>
+      <BoardProvider>
+        <BoardItem />
+        <ModalWindow />
+      </BoardProvider>
     </>
   );
 };
