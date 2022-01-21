@@ -1,22 +1,25 @@
-import { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { FC, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
+import { boardSlice } from '../../redux/store/reducers/board-reducer';
 
 const ModalWindow: FC = () => {
-  const [state, dispatch] = useContext(BoardContext);
-  const [visible, setModal] = useState(() => state.user === '');
+  const { user } = useAppSelector((state) => state.boardSlice);
+  const { addUserName } = boardSlice.actions;
+  const dispatch = useAppDispatch();
+
+  const [visible, setModal] = useState(() => user === '');
   const [value, setValue] = useState('Гость');
 
-  const addUserName = useCallback(() => {
-    dispatch({ type: BoardActionTypes.AddUserName, payload: { user: value } });
-  }, [value, dispatch]);
+  const addUserNameFunction = useCallback(() => {
+    dispatch(addUserName(value));
+  }, [dispatch, addUserName, value]);
 
   const onClose = () => setModal(false);
 
   const addUserNameAndCloseModal = () => {
-    addUserName();
+    addUserNameFunction();
     onClose();
   };
 
@@ -28,9 +31,10 @@ const ModalWindow: FC = () => {
     }
   };
 
-  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      addUserName();
+      addUserNameFunction();
+      onClose();
     }
   };
 

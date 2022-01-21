@@ -1,6 +1,6 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 
-import { BoardContext } from '../../context/board/board-context';
+import { useAppSelector } from '../../redux/hooks/redux';
 import CardItem from '../card-item';
 
 interface CardListProps {
@@ -8,10 +8,11 @@ interface CardListProps {
 }
 
 const CardList: FC<CardListProps> = ({ columnId }) => {
-  const [state] = useContext(BoardContext);
+  const { cards } = useAppSelector((state) => state.boardSlice.columns[columnId]);
+
   return (
     <div>
-      {Object.values(state.columns?.[columnId]?.cards || []).map((card) => (
+      {Object.values(cards).map((card) => (
         <CardItem
           key={card.id}
           card={card}

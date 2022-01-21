@@ -1,17 +1,20 @@
-import { FC, KeyboardEventHandler, useCallback, useContext, useState } from 'react';
+import { FC, KeyboardEventHandler, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { useAppDispatch } from '../../redux/hooks/redux';
+import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import ColumnList from '../column-list';
 
 const BoardItem: FC = () => {
-  const [, dispatch] = useContext(BoardContext);
   const [value, setValue] = useState('');
 
-  const addColumn = useCallback(() => {
-    dispatch({ type: BoardActionTypes.AddColumn, payload: { title: value } });
-  }, [value, dispatch]);
+  const { addColumn } = boardSlice.actions;
+  const dispatch = useAppDispatch();
+
+  const addColumnFunction = useCallback(() => {
+    dispatch(addColumn({ title: value }));
+  }, [dispatch, addColumn, value]);
+
   const clearInput = () => {
     setValue('');
   };
@@ -20,7 +23,7 @@ const BoardItem: FC = () => {
     if (value === '') {
       return;
     }
-    addColumn();
+    addColumnFunction();
     clearInput();
   };
 

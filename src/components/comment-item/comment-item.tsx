@@ -1,8 +1,8 @@
-import { FC, KeyboardEventHandler, useCallback, useContext, useState } from 'react';
+import { FC, KeyboardEventHandler, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
+import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Comment } from '../../types/data';
 
 interface CommentProps {
@@ -13,19 +13,18 @@ interface CommentProps {
 
 const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
   const { id: commentId } = comment;
-  const [state, dispatch] = useContext(BoardContext);
   const [value, setValue] = useState(comment.title);
   const [visible, setVisible] = useState(true);
+  const { user } = useAppSelector((state) => state.boardSlice);
+  const { updateComment, removeComment } = boardSlice.actions;
+  const dispatch = useAppDispatch();
 
-  const updateComment = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.UpdateComment,
-      payload: { title: value, columnId, cardId, commentId },
-    });
-  }, [dispatch, value, columnId, cardId, commentId]);
+  const updateCommentFunction = useCallback(() => {
+    dispatch(updateComment({ title: value, columnId, cardId, commentId }));
+  }, [dispatch, updateComment, value, columnId, cardId, commentId]);
 
   const updateCommentAndClose = () => {
-    updateComment();
+    updateCommentFunction();
     toggleComment();
   };
 
@@ -37,22 +36,19 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
 
   const toggleComment = () => (visible ? setVisible(false) : setVisible(true));
 
-  const removeComment = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.RemoveComment,
-      payload: { columnId, cardId, commentId },
-    });
-  }, [dispatch, columnId, cardId, commentId]);
+  const removeCommentFunction = useCallback(() => {
+    dispatch(removeComment({ columnId, cardId, commentId }));
+  }, [dispatch, removeComment, columnId, cardId, commentId]);
 
   return (
     <CommentWrapper>
-      <CommentUser>{state.user}:</CommentUser>
+      <CommentUser>{user}:</CommentUser>
       {visible ? (
         <CommentItemWrapper>
           <div onDoubleClick={toggleComment}>{comment.title}</div>
           <CommentItemButtons>
             <button onClick={toggleComment}>Edit</button>
-            <button onClick={removeComment}>Del</button>
+            <button onClick={removeCommentFunction}>Del</button>
           </CommentItemButtons>
         </CommentItemWrapper>
       ) : (

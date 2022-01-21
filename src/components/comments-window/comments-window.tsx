@@ -1,8 +1,8 @@
-import { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { useAppDispatch } from '../../redux/hooks/redux';
+import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Modal } from '../../types/data';
 import CommentsList from '../comments-list';
 
@@ -17,21 +17,19 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
   visible = false,
   onClose,
 }) => {
+  const dispatch = useAppDispatch();
+  const { addComment } = boardSlice.actions;
   const [value, setValue] = useState('');
-  const [, dispatch] = useContext(BoardContext);
 
-  const addComment = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.AddComment,
-      payload: { title: value, columnId, cardId },
-    });
-  }, [dispatch, value, columnId, cardId]);
+  const addCommentFunction = useCallback(() => {
+    dispatch(addComment({ title: value, columnId, cardId }));
+  }, [dispatch, addComment, value, columnId, cardId]);
 
   const clearInput = () => setValue('');
 
   const addCommentAndClearInput = () => {
     if (value === '') return;
-    addComment();
+    addCommentFunction();
     clearInput();
   };
 

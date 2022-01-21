@@ -18,7 +18,7 @@ interface ColumnAddAction {
   payload: { title: string };
 }
 
-interface ColumnUpdateAction {
+export interface ColumnUpdateAction {
   type: BoardActionTypes.UpdateColumn;
   payload: { title: string; columnId: string };
 }

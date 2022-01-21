@@ -1,7 +1,7 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
+import { useAppSelector } from '../../redux/hooks/redux';
 import CommentItem from '../comment-item';
 interface CommentsListProps {
   columnId: string;
@@ -9,10 +9,12 @@ interface CommentsListProps {
 }
 
 const CommentsList: FC<CommentsListProps> = ({ columnId, cardId }) => {
-  const [state] = useContext(BoardContext);
+  const { comments } = useAppSelector(
+    (state) => state.boardSlice.columns[columnId].cards[cardId],
+  );
   return (
     <CommentsListWrapper>
-      {Object.values(state.columns[columnId].cards[cardId].comments).map((comment) => (
+      {Object.values(comments).map((comment) => (
         <CommentItem
           key={comment.id}
           comment={comment}

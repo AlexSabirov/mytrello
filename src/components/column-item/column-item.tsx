@@ -1,31 +1,27 @@
-import {
-  FC,
-  KeyboardEventHandler,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { FC, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { useAppDispatch } from '../../redux/hooks/redux';
+import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Columns } from '../../types/data';
 import CardList from '../card-list';
+
 interface ColumnProps {
   column: Columns;
 }
 
 const ColumnItem: FC<ColumnProps> = ({ column }) => {
   const { id: columnId } = column;
-  const [, dispatch] = useContext(BoardContext);
+  const { updateColumn, removeColumn, addCard } = boardSlice.actions;
+  const dispatch = useAppDispatch();
+
   const [value, setValue] = useState('');
   const [valueUpdate, setValueUpdate] = useState(column.title);
   const [visibleTitle, setVisibleTitle] = useState(true);
 
-  const addCard = useCallback(() => {
-    dispatch({ type: BoardActionTypes.AddCard, payload: { title: value, columnId } });
-  }, [dispatch, value, columnId]);
+  const addCardFunction = useCallback(() => {
+    dispatch(addCard({ title: value, columnId }));
+  }, [dispatch, addCard, value, columnId]);
 
   const clearInput = () => {
     setValue('');
@@ -35,20 +31,17 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     if (value === '') {
       return;
     }
-    addCard();
+    addCardFunction();
     clearInput();
   };
 
-  const updateColumn = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.UpdateColumn,
-      payload: { title: valueUpdate, columnId },
-    });
-  }, [dispatch, valueUpdate, columnId]);
+  const updateColumnFunction = useCallback(() => {
+    dispatch(updateColumn({ title: valueUpdate, columnId }));
+  }, [dispatch, updateColumn, valueUpdate, columnId]);
 
   const updateColumnAndClose = () => {
     if (valueUpdate === '') return;
-    updateColumn();
+    updateColumnFunction();
     toggleTitle();
   };
 
@@ -70,12 +63,9 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
 
   const closeTitle = () => setVisibleTitle(true);
 
-  const removeColumn = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.RemoveColumn,
-      payload: { columnId },
-    });
-  }, [dispatch, columnId]);
+  const removeColumnFunction = useCallback(() => {
+    dispatch(removeColumn({ columnId }));
+  }, [dispatch, removeColumn, columnId]);
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -106,6 +96,7 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
               }}
               onKeyDown={handleKeyDownUpdateColumn}
             />
+            <button onClick={updateColumnAndClose}></button>
             <ButtonUpdateTitle onClick={updateColumnAndClose}>ОК</ButtonUpdateTitle>
             <ButtonTitle onClick={toggleTitle}>х</ButtonTitle>
           </UpdateColumnWrapper>
@@ -120,7 +111,7 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
         </ColumnInputWrapper>
       </ColumnButtonsWrapper>
       <CardList columnId={columnId} />
-      <RemoveColumnButton onClick={removeColumn}>X</RemoveColumnButton>
+      <RemoveColumnButton onClick={removeColumnFunction}>X</RemoveColumnButton>
     </ColumnWrapper>
   );
 };

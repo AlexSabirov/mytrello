@@ -1,14 +1,14 @@
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
+import { useAppSelector } from '../../redux/hooks/redux';
 import ColumnItem from '../column-item';
 
 const ColumnList: FC = () => {
-  const [state] = useContext(BoardContext);
+  const { columns } = useAppSelector((state) => state.boardSlice);
   return (
     <ColumnListWrapper>
-      {Object.values(state.columns).map((column) => {
+      {Object.values(columns).map((column) => {
         return <ColumnItem key={column.id} column={column} />;
       })}
     </ColumnListWrapper>

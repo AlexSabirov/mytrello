@@ -1,8 +1,8 @@
-import { FC, useCallback, useContext, useState } from 'react';
+import { FC, KeyboardEventHandler, useCallback, useState } from 'react';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { useAppDispatch } from '../../redux/hooks/redux';
+import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Card } from '../../types/data';
 import CommentsWindow from '../comments-window';
 
@@ -14,34 +14,36 @@ interface CardProps {
 
 const CardItem: FC<CardProps> = ({ columnId, card }) => {
   const { id: cardId } = card;
-  const [, dispatch] = useContext(BoardContext);
   const [isModalComment, setModalComment] = useState(false);
   const onOpen = () => setModalComment(true);
   const onClose = () => setModalComment(false);
   const [value, setValue] = useState(card.title);
   const [visibleCard, setVisibleCard] = useState(true);
 
-  const updateColumn = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.UpdateCard,
-      payload: { title: value, columnId, cardId },
-    });
-  }, [dispatch, value, columnId, cardId]);
+  const { updateCard, removeCard } = boardSlice.actions;
+  const dispatch = useAppDispatch();
+
+  const updateColumnFunction = useCallback(() => {
+    dispatch(updateCard({ title: value, columnId, cardId }));
+  }, [dispatch, updateCard, value, columnId, cardId]);
 
   const updateColumnAndClose = () => {
-    updateColumn();
+    updateColumnFunction();
     toggleCard();
+  };
+
+  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === 'Enter') {
+      updateColumnAndClose();
+    }
   };
 
   const toggleCard = () => {
     visibleCard ? setVisibleCard(false) : setVisibleCard(true);
   };
-  const removeCard = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.RemoveCard,
-      payload: { columnId, cardId },
-    });
-  }, [dispatch, columnId, cardId]);
+  const removeCardFunction = useCallback(() => {
+    dispatch(removeCard({ columnId, cardId }));
+  }, [dispatch, removeCard, columnId, cardId]);
 
   return (
     <CardWrapper>
@@ -50,12 +52,16 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
           <CardItemTitle onClick={onOpen}>{card.title}</CardItemTitle>
           <CardItemButtons>
             <button onClick={toggleCard}>Edit</button>
-            <button onClick={removeCard}>Del</button>
+            <button onClick={removeCardFunction}>Del</button>
           </CardItemButtons>
         </CardItemWrapper>
       ) : (
         <CardItemWrapper>
-          <input value={value} onChange={(e) => setValue(e.target.value)} />
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
           <CardItemButtons>
             <button onClick={updateColumnAndClose}>Принять</button>
             <button onClick={toggleCard}>X</button>
