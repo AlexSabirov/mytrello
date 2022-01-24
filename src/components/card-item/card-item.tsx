@@ -1,4 +1,5 @@
-import { FC, KeyboardEventHandler, useCallback, useState } from 'react';
+import { ChangeEvent, FC, KeyboardEventHandler, useCallback, useState } from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch } from '../../redux/hooks/redux';
@@ -23,18 +24,18 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
   const { updateCard, removeCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
 
-  const updateColumnFunction = useCallback(() => {
+  const updateCardFunction = useCallback(() => {
     dispatch(updateCard({ title: value, columnId, cardId }));
   }, [dispatch, updateCard, value, columnId, cardId]);
 
-  const updateColumnAndClose = () => {
-    updateColumnFunction();
+  const updateCardAndClose = () => {
+    updateCardFunction();
     toggleCard();
   };
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      updateColumnAndClose();
+      updateCardAndClose();
     }
   };
 
@@ -44,6 +45,28 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
   const removeCardFunction = useCallback(() => {
     dispatch(removeCard({ columnId, cardId }));
   }, [dispatch, removeCard, columnId, cardId]);
+
+  const UpdateColumnForm = () => (
+    <Form
+      onSubmit={() => {}}
+      render={() => (
+        <CardItemWrapper>
+          <Field
+            name="UpdateColumn"
+            initialValue={value}
+            value={value}
+            component="input"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <CardItemButtons>
+            <button onClick={updateCardAndClose}>Принять</button>
+            <button onClick={toggleCard}>X</button>
+          </CardItemButtons>
+        </CardItemWrapper>
+      )}
+    />
+  );
 
   return (
     <CardWrapper>
@@ -56,17 +79,7 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
           </CardItemButtons>
         </CardItemWrapper>
       ) : (
-        <CardItemWrapper>
-          <input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <CardItemButtons>
-            <button onClick={updateColumnAndClose}>Принять</button>
-            <button onClick={toggleCard}>X</button>
-          </CardItemButtons>
-        </CardItemWrapper>
+        <div>{UpdateColumnForm()}</div>
       )}
       <CommentsWindow
         visible={isModalComment}

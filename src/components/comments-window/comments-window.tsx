@@ -1,4 +1,5 @@
 import { FC, useCallback, useEffect, useState } from 'react';
+import { Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch } from '../../redux/hooks/redux';
@@ -52,9 +53,10 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
     return () => document.removeEventListener('keydown', onKeydown);
   });
 
-  return !visible ? null : (
-    <ModalWindowWrapper onClick={onClose}>
-      <ModalWindowContent onClick={(e) => e.stopPropagation()}>
+  const NewCommentForm = () => (
+    <Form
+      onSubmit={() => {}}
+      render={() => (
         <CommentInputWrapper>
           <p>Ваш комментарий:</p>
           <CommentInput
@@ -64,6 +66,14 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
           />
           <CommentButton onClick={addCommentAndClearInput}>+</CommentButton>
         </CommentInputWrapper>
+      )}
+    />
+  );
+
+  return !visible ? null : (
+    <ModalWindowWrapper onClick={onClose}>
+      <ModalWindowContent onClick={(e) => e.stopPropagation()}>
+        {NewCommentForm()}
         <CommentWindowCloseButton onClick={onClose}>X</CommentWindowCloseButton>
         <CommentsList columnId={columnId} cardId={cardId} />
       </ModalWindowContent>

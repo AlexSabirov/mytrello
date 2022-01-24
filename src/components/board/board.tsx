@@ -1,4 +1,5 @@
-import { FC, KeyboardEventHandler, useCallback, useState } from 'react';
+import { ChangeEvent, FC, KeyboardEventHandler, useCallback, useState } from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch } from '../../redux/hooks/redux';
@@ -33,15 +34,30 @@ const BoardItem: FC = () => {
     }
   };
 
+  const NewColumnForm = () => (
+    <Form
+      onSubmit={() => {}}
+      render={() => (
+        <div>
+          <Field
+            name="NewColumn"
+            placeholder="Введите имя колонки"
+            initialValue={value}
+            value={value}
+            component="input"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button onClick={addColumnAndClearInput}>Add Column</button>
+        </div>
+      )}
+    />
+  );
+
   return (
     <BoardWrapper>
       <ColumnList />
-      <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <button onClick={addColumnAndClearInput}>Add Column</button>
+      {NewColumnForm()}
     </BoardWrapper>
   );
 };

@@ -1,4 +1,12 @@
-import { FC, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  KeyboardEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
@@ -43,20 +51,33 @@ const ModalWindow: FC = () => {
     return () => document.removeEventListener('keydown', onKeydown);
   });
 
+  const UserNameForm = () => (
+    <Form
+      onSubmit={() => {}}
+      render={() => (
+        <div>
+          <h3>Введите ваше имя:</h3>
+          <InputWrapper>
+            <Field
+              name="UserName"
+              placeholder="Введите имя"
+              initialValue={value}
+              value={value}
+              component="input"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <ButtonAccept onClick={addUserNameAndCloseModal}>Принять</ButtonAccept>
+            <ModalClose onClick={onClose}>X</ModalClose>
+          </InputWrapper>
+        </div>
+      )}
+    />
+  );
+
   return !visible ? null : (
     <ModalWrapper onClick={onClose}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>
-        <h3>Введите ваше имя:</h3>
-        <InputWrapper>
-          <input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <ButtonAccept onClick={addUserNameAndCloseModal}>Принять</ButtonAccept>
-          <ModalClose onClick={onClose}>X</ModalClose>
-        </InputWrapper>
-      </ModalContent>
+      <ModalContent onClick={(e) => e.stopPropagation()}>{UserNameForm()}</ModalContent>
     </ModalWrapper>
   );
 };

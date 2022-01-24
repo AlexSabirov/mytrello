@@ -1,4 +1,5 @@
 import { FC, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
+import { Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch } from '../../redux/hooks/redux';
@@ -79,15 +80,13 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     return () => document.removeEventListener('keydown', onKeydown);
   });
 
-  return (
-    <ColumnWrapper>
-      <ColumnButtonsWrapper>
-        {visibleTitle ? (
-          <ColumnTitleWrapper>
-            <ColumnTitle onDoubleClick={toggleTitle}>{column.title}</ColumnTitle>
-            <ButtonTitle onClick={toggleTitle}>Edit</ButtonTitle>
-          </ColumnTitleWrapper>
-        ) : (
+  const UpdateColumnForm = () => (
+    <Form
+      onSubmit={() => {
+        return;
+      }}
+      render={() => (
+        <form>
           <UpdateColumnWrapper>
             <input
               value={valueUpdate}
@@ -100,7 +99,15 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
             <ButtonUpdateTitle onClick={updateColumnAndClose}>ОК</ButtonUpdateTitle>
             <ButtonTitle onClick={toggleTitle}>х</ButtonTitle>
           </UpdateColumnWrapper>
-        )}
+        </form>
+      )}
+    />
+  );
+
+  const NewCardForm = () => (
+    <Form
+      onSubmit={() => {}}
+      render={() => (
         <ColumnInputWrapper>
           <ColumnInput
             value={value}
@@ -109,6 +116,22 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
           />
           <ColumnButton onClick={addCardAndClearInput}>+</ColumnButton>
         </ColumnInputWrapper>
+      )}
+    />
+  );
+
+  return (
+    <ColumnWrapper>
+      <ColumnButtonsWrapper>
+        {visibleTitle ? (
+          <ColumnTitleWrapper>
+            <ColumnTitle onDoubleClick={toggleTitle}>{column.title}</ColumnTitle>
+            <ButtonTitle onClick={toggleTitle}>Edit</ButtonTitle>
+          </ColumnTitleWrapper>
+        ) : (
+          <div>{UpdateColumnForm()}</div>
+        )}
+        {NewCardForm()}
       </ColumnButtonsWrapper>
       <CardList columnId={columnId} />
       <RemoveColumnButton onClick={removeColumnFunction}>X</RemoveColumnButton>

@@ -1,4 +1,5 @@
 import { FC, KeyboardEventHandler, useCallback, useState } from 'react';
+import { Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
@@ -40,18 +41,10 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
     dispatch(removeComment({ columnId, cardId, commentId }));
   }, [dispatch, removeComment, columnId, cardId, commentId]);
 
-  return (
-    <CommentWrapper>
-      <CommentUser>{user}:</CommentUser>
-      {visible ? (
-        <CommentItemWrapper>
-          <div onDoubleClick={toggleComment}>{comment.title}</div>
-          <CommentItemButtons>
-            <button onClick={toggleComment}>Edit</button>
-            <button onClick={removeCommentFunction}>Del</button>
-          </CommentItemButtons>
-        </CommentItemWrapper>
-      ) : (
+  const UpdateCommentForm = () => (
+    <Form
+      onSubmit={() => {}}
+      render={() => (
         <CommentItemWrapper>
           <input
             value={value}
@@ -65,6 +58,23 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
             <button onClick={toggleComment}>X</button>
           </CommentItemButtons>
         </CommentItemWrapper>
+      )}
+    />
+  );
+
+  return (
+    <CommentWrapper>
+      <CommentUser>{user}:</CommentUser>
+      {visible ? (
+        <CommentItemWrapper>
+          <div onDoubleClick={toggleComment}>{comment.title}</div>
+          <CommentItemButtons>
+            <button onClick={toggleComment}>Edit</button>
+            <button onClick={removeCommentFunction}>Del</button>
+          </CommentItemButtons>
+        </CommentItemWrapper>
+      ) : (
+        <div>{UpdateCommentForm()}</div>
       )}
     </CommentWrapper>
   );
