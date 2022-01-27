@@ -1,5 +1,6 @@
-import { FC, KeyboardEventHandler, useCallback, useState } from 'react';
-import { Form } from 'react-final-form';
+import { FormApi } from 'final-form';
+import { FC, KeyboardEventHandler, useCallback, useRef, useState } from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
@@ -14,24 +15,30 @@ interface CommentProps {
 
 const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
   const { id: commentId } = comment;
-  const [value, setValue] = useState(comment.title);
   const [visible, setVisible] = useState(true);
   const { user } = useAppSelector((state) => state.boardSlice);
   const { updateComment, removeComment } = boardSlice.actions;
   const dispatch = useAppDispatch();
+  const formRef = useRef<FormApi<CommentUpdate, Partial<CommentUpdate>>>();
 
-  const updateCommentFunction = useCallback(() => {
-    dispatch(updateComment({ title: value, columnId, cardId, commentId }));
-  }, [dispatch, updateComment, value, columnId, cardId, commentId]);
+  const updateCommentFunction = useCallback(
+    (values: CommentUpdate) => {
+      dispatch(updateComment({ title: values['comment'], columnId, cardId, commentId }));
+    },
+    [dispatch, updateComment, columnId, cardId, commentId],
+  );
 
-  const updateCommentAndClose = () => {
-    updateCommentFunction();
+  const updateCommentAndClose = (values: CommentUpdate) => {
+    updateCommentFunction(values);
     toggleComment();
   };
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      updateCommentAndClose();
+      if (formRef.current) {
+        const { values } = formRef.current.getState();
+        updateCommentAndClose(values);
+      }
     }
   };
 
@@ -41,24 +48,30 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
     dispatch(removeComment({ columnId, cardId, commentId }));
   }, [dispatch, removeComment, columnId, cardId, commentId]);
 
-  const UpdateCommentForm = () => (
+  const initialValues = { comment: comment.title };
+
+  const onSubmit = (values: CommentUpdate) => {
+    !values.comment
+      ? updateCommentAndClose(initialValues)
+      : updateCommentAndClose(values);
+  };
+
+  const UpdateCommentForm: FC<CommentUpdateFieldProps> = () => (
     <Form
-      onSubmit={() => {}}
-      render={() => (
-        <CommentItemWrapper>
-          <input
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-            }}
-            onKeyDown={handleKeyDown}
-          />
-          <CommentItemButtons>
-            <button onClick={updateCommentAndClose}>Принять</button>
-            <button onClick={toggleComment}>X</button>
-          </CommentItemButtons>
-        </CommentItemWrapper>
-      )}
+      onSubmit={onSubmit}
+      initialValues={initialValues}
+      render={({ form, handleSubmit }) => {
+        formRef.current = form;
+        return (
+          <CommentItemWrapper onSubmit={handleSubmit}>
+            <Field name="comment" render={(props) => <input {...props.input} />} />
+            <CommentItemButtons>
+              <button type="submit">Принять</button>
+              <button onClick={toggleComment}>X</button>
+            </CommentItemButtons>
+          </CommentItemWrapper>
+        );
+      }}
     />
   );
 
@@ -74,11 +87,19 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
           </CommentItemButtons>
         </CommentItemWrapper>
       ) : (
-        <div>{UpdateCommentForm()}</div>
+        <UpdateCommentForm onKeyDown={handleKeyDown} />
       )}
     </CommentWrapper>
   );
 };
+
+interface CommentUpdateFieldProps {
+  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
+}
+
+interface CommentUpdate {
+  comment: string;
+}
 
 const CommentWrapper = styled.div`
   padding: 5px 3px;
@@ -89,7 +110,7 @@ const CommentWrapper = styled.div`
   }
 `;
 
-const CommentItemWrapper = styled.div`
+const CommentItemWrapper = styled.form`
   display: flex;
 `;
 const CommentItemButtons = styled.div`

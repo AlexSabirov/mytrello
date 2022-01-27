@@ -1,11 +1,20 @@
-import { FC, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
-import { Form } from 'react-final-form';
+import { FormApi } from 'final-form';
+import {
+  FC,
+  KeyboardEventHandler,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Columns } from '../../types/data';
 import CardList from '../card-list';
+import { CardName, initialValuesCardAdd } from './form-values';
 
 interface ColumnProps {
   column: Columns;
@@ -16,45 +25,46 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
   const { updateColumn, removeColumn, addCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
 
-  const [value, setValue] = useState('');
-  const [valueUpdate, setValueUpdate] = useState(column.title);
   const [visibleTitle, setVisibleTitle] = useState(true);
+  const formRefCard = useRef<FormApi<CardName, Partial<CardName>>>();
+  const formRefColumn = useRef<FormApi<ColumnNameUpdate, Partial<ColumnNameUpdate>>>();
 
-  const addCardFunction = useCallback(() => {
-    dispatch(addCard({ title: value, columnId }));
-  }, [dispatch, addCard, value, columnId]);
+  const addCardFunction = useCallback(
+    (values) => {
+      dispatch(addCard({ title: values['card'], columnId }));
+    },
+    [dispatch, addCard, columnId],
+  );
 
-  const clearInput = () => {
-    setValue('');
-  };
+  const updateColumnFunction = useCallback(
+    (values) => {
+      dispatch(updateColumn({ title: values['columns'], columnId }));
+    },
+    [dispatch, updateColumn, columnId],
+  );
 
-  const addCardAndClearInput = () => {
-    if (value === '') {
-      return;
-    }
-    addCardFunction();
-    clearInput();
-  };
-
-  const updateColumnFunction = useCallback(() => {
-    dispatch(updateColumn({ title: valueUpdate, columnId }));
-  }, [dispatch, updateColumn, valueUpdate, columnId]);
-
-  const updateColumnAndClose = () => {
-    if (valueUpdate === '') return;
-    updateColumnFunction();
+  const updateColumnAndClose = (values: ColumnNameUpdate) => {
+    updateColumnFunction(values);
     toggleTitle();
   };
 
   const handleKeyDownAddCard: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      addCardAndClearInput();
+      if (formRefCard.current) {
+        const { values } = formRefCard.current.getState();
+        addCardFunction(values);
+        formRefCard.current.change('card', '');
+      }
     }
   };
 
   const handleKeyDownUpdateColumn: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      updateColumnAndClose();
+      if (formRefColumn.current) {
+        const { values } = formRefColumn.current.getState();
+        addCardFunction(values);
+        formRefColumn.current.change('columns', '');
+      }
     }
   };
 
@@ -80,43 +90,52 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     return () => document.removeEventListener('keydown', onKeydown);
   });
 
-  const UpdateColumnForm = () => (
+  const columnUpdateSubmit = (values: ColumnNameUpdate) => {
+    !values.columns
+      ? updateColumnAndClose(initialValuesColumnUpdate)
+      : updateColumnAndClose(values);
+  };
+
+  const initialValuesColumnUpdate = { columns: column.title };
+
+  const UpdateColumnForm: FC<UpdateColumnFieldProps> = () => (
     <Form
-      onSubmit={() => {
-        return;
-      }}
-      render={() => (
-        <form>
-          <UpdateColumnWrapper>
-            <input
-              value={valueUpdate}
-              onChange={(e) => {
-                setValueUpdate(e.target.value);
-              }}
-              onKeyDown={handleKeyDownUpdateColumn}
-            />
-            <button onClick={updateColumnAndClose}></button>
-            <ButtonUpdateTitle onClick={updateColumnAndClose}>ОК</ButtonUpdateTitle>
+      onSubmit={columnUpdateSubmit}
+      initialValues={initialValuesColumnUpdate}
+      render={({ form, handleSubmit }) => {
+        formRefColumn.current = form;
+        return (
+          <UpdateColumnWrapper onSubmit={handleSubmit}>
+            <Field name="columns" render={(props) => <input {...props.input} />} />
+            <ButtonUpdateTitle type="submit">ОК</ButtonUpdateTitle>
             <ButtonTitle onClick={toggleTitle}>х</ButtonTitle>
           </UpdateColumnWrapper>
-        </form>
-      )}
+        );
+      }}
     />
   );
 
-  const NewCardForm = () => (
+  const newCardSubmit = (values: CardName) => {
+    !values.card ? addCardFunction(initialValuesCardAdd) : addCardFunction(values);
+  };
+
+  const NewCardForm: FC<CardAddFieldProps> = () => (
     <Form
-      onSubmit={() => {}}
-      render={() => (
-        <ColumnInputWrapper>
-          <ColumnInput
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDownAddCard}
-          />
-          <ColumnButton onClick={addCardAndClearInput}>+</ColumnButton>
-        </ColumnInputWrapper>
-      )}
+      onSubmit={newCardSubmit}
+      render={({ form, handleSubmit }) => {
+        formRefCard.current = form;
+        return (
+          <ColumnInputWrapper onSubmit={handleSubmit}>
+            <Field
+              name="card"
+              render={(props) => (
+                <ColumnInput {...props.input} placeholder="Введите имя карточки" />
+              )}
+            />
+            <ColumnButton type="submit">+</ColumnButton>
+          </ColumnInputWrapper>
+        );
+      }}
     />
   );
 
@@ -129,15 +148,27 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
             <ButtonTitle onClick={toggleTitle}>Edit</ButtonTitle>
           </ColumnTitleWrapper>
         ) : (
-          <div>{UpdateColumnForm()}</div>
+          <UpdateColumnForm onKeyDown={handleKeyDownUpdateColumn} />
         )}
-        {NewCardForm()}
+        <NewCardForm onKeyDown={handleKeyDownAddCard} />
       </ColumnButtonsWrapper>
       <CardList columnId={columnId} />
       <RemoveColumnButton onClick={removeColumnFunction}>X</RemoveColumnButton>
     </ColumnWrapper>
   );
 };
+
+interface ColumnNameUpdate {
+  columns: string;
+}
+
+interface CardAddFieldProps {
+  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
+}
+
+interface UpdateColumnFieldProps {
+  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
+}
 
 const ColumnWrapper = styled.div`
   display: flex;
@@ -165,7 +196,7 @@ const ButtonTitle = styled.button`
   padding: 0 5px;
 `;
 
-const UpdateColumnWrapper = styled.div`
+const UpdateColumnWrapper = styled.form`
   min-height: 55px;
   display: flex;
   padding: 10px 5px;
@@ -181,7 +212,7 @@ const ColumnButtonsWrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-const ColumnInputWrapper = styled.div`
+const ColumnInputWrapper = styled.form`
   display: flex;
   margin-bottom: 5px;
   border: 1px solid rgb(0, 0, 0);

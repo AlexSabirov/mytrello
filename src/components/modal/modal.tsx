@@ -1,9 +1,10 @@
+import { FormApi } from 'final-form';
 import {
-  ChangeEvent,
   FC,
   KeyboardEventHandler,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Field, Form } from 'react-final-form';
@@ -11,25 +12,32 @@ import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
+import { FieldRenderProps, initialValues, UserName } from './form-values';
 
 const ModalWindow: FC = () => {
   const { user } = useAppSelector((state) => state.boardSlice);
   const { addUserName } = boardSlice.actions;
   const dispatch = useAppDispatch();
+  const formRef = useRef<FormApi<UserName, Partial<UserName>>>();
 
   const [visible, setModal] = useState(() => user === '');
-  const [value, setValue] = useState('Гость');
 
-  const addUserNameFunction = useCallback(() => {
-    dispatch(addUserName(value));
-  }, [dispatch, addUserName, value]);
+  const addUserNameFunction = useCallback(
+    (values) => {
+      dispatch(addUserName(values['user']));
+    },
+    [dispatch, addUserName],
+  );
 
   const onClose = () => setModal(false);
 
-  const addUserNameAndCloseModal = () => {
-    addUserNameFunction();
-    onClose();
-  };
+  // const addUserNameAndCloseModal = () => {
+  //   if (formRef.current) {
+  //     const { values } = formRef.current.getState();
+  //     addUserNameFunction(values);
+  //   }
+  //   onClose();
+  // };
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -41,7 +49,10 @@ const ModalWindow: FC = () => {
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      addUserNameFunction();
+      if (formRef.current) {
+        const { values } = formRef.current.getState();
+        addUserNameFunction(values);
+      }
       onClose();
     }
   };
@@ -51,33 +62,41 @@ const ModalWindow: FC = () => {
     return () => document.removeEventListener('keydown', onKeydown);
   });
 
-  const UserNameForm = () => (
+  const onSubmit = (values: UserName) => {
+    !values.user ? addUserNameFunction(initialValues) : addUserNameFunction(values);
+    onClose();
+  };
+
+  const UserNameForm: FC<FieldRenderProps> = () => (
     <Form
-      onSubmit={() => {}}
-      render={() => (
-        <div>
-          <h3>Введите ваше имя:</h3>
-          <InputWrapper>
-            <Field
-              name="UserName"
-              placeholder="Введите имя"
-              initialValue={value}
-              value={value}
-              component="input"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <ButtonAccept onClick={addUserNameAndCloseModal}>Принять</ButtonAccept>
-            <ModalClose onClick={onClose}>X</ModalClose>
-          </InputWrapper>
-        </div>
-      )}
+      onSubmit={onSubmit}
+      initialValues={initialValues}
+      render={({ form, handleSubmit }) => {
+        formRef.current = form;
+        return (
+          <form onSubmit={handleSubmit}>
+            <label>Введите ваше имя:</label>
+            <InputWrapper>
+              <Field
+                name="user"
+                placeholder="Введите имя"
+                type="text"
+                render={(props) => <input {...props.input} />}
+              />
+              <ButtonAccept type="submit">Принять</ButtonAccept>
+              <ModalClose onClick={onClose}>X</ModalClose>
+            </InputWrapper>
+          </form>
+        );
+      }}
     />
   );
 
   return !visible ? null : (
     <ModalWrapper onClick={onClose}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>{UserNameForm()}</ModalContent>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
+        <UserNameForm onKeyDown={handleKeyDown} />
+      </ModalContent>
     </ModalWrapper>
   );
 };
