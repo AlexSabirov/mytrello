@@ -102,6 +102,7 @@ interface RemoveComment {
 }
 
 export default boardSlice.reducer;
+
 export const {
   addUserName,
   addColumn,

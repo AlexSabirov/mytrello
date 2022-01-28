@@ -3,19 +3,19 @@ import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch } from '../../redux/hooks/redux';
+// import { useToggle } from '../../redux/hooks/useToggle';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Card } from '../../types/data';
 import CommentsWindow from '../comments-window';
-import { CardForm, CardUpdate, CardUpdateFieldProps } from './form-values';
+import { CardForm, CardUpdate } from './form-values';
 
-interface CardProps {
+interface CardItemProps {
   columnId: string;
   cardId: string;
   card: Card;
 }
 
-const CardItem: FC<CardProps> = ({ columnId, card }) => {
-  const { id: cardId } = card;
+const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
   const [isModalComment, setModalComment] = useState(false);
   const onOpen = () => setModalComment(true);
   const onClose = () => setModalComment(false);
@@ -23,6 +23,7 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
   const { updateCard, removeCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
   const formRef = useRef<CardForm>();
+  // const toggleCard = useToggle();
 
   const updateCardFunction = useCallback(
     (values: CardUpdate) => {
@@ -32,22 +33,20 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
   );
 
   const updateCardAndClose = (values: CardUpdate) => {
-    updateCardFunction(values);
+    updateCardFunction(!values.card ? initialValues : values);
     toggleCard();
   };
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      if (formRef.current) {
-        const { values } = formRef.current.getState();
-        updateCardAndClose(values);
-      }
+      onSubmit;
     }
   };
 
   const toggleCard = () => {
-    visibleCard ? setVisibleCard(false) : setVisibleCard(true);
+    setVisibleCard((state) => !state);
   };
+
   const removeCardFunction = useCallback(() => {
     dispatch(removeCard({ columnId, cardId }));
   }, [dispatch, removeCard, columnId, cardId]);
@@ -55,27 +54,8 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
   const initialValues = { card: card.title };
 
   const onSubmit = (values: CardUpdate) => {
-    !values.card ? updateCardAndClose(initialValues) : updateCardAndClose(values);
+    updateCardAndClose(values);
   };
-
-  const UpdateCardForm: FC<CardUpdateFieldProps> = () => (
-    <Form
-      onSubmit={onSubmit}
-      initialValues={initialValues}
-      render={({ form, handleSubmit }) => {
-        formRef.current = form;
-        return (
-          <CardItemWrapper onSubmit={handleSubmit}>
-            <Field name="card" render={(props) => <input {...props.input} />} />
-            <CardItemButtons>
-              <button type="submit">Принять</button>
-              <button onClick={toggleCard}>X</button>
-            </CardItemButtons>
-          </CardItemWrapper>
-        );
-      }}
-    />
-  );
 
   return (
     <CardWrapper>
@@ -88,7 +68,25 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
           </CardItemButtons>
         </CardItemWrapper>
       ) : (
-        <UpdateCardForm onKeyDown={handleKeyDown} />
+        <Form
+          onSubmit={onSubmit}
+          initialValues={initialValues}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <CardItemWrapper onSubmit={handleSubmit}>
+                <Field
+                  name="card"
+                  render={(props) => <input {...props.input} onKeyDown={handleKeyDown} />}
+                />
+                <CardItemButtons>
+                  <button type="submit">Принять</button>
+                  <button onClick={toggleCard}>X</button>
+                </CardItemButtons>
+              </CardItemWrapper>
+            );
+          }}
+        />
       )}
       <CommentsWindow
         visible={isModalComment}

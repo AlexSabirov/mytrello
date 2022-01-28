@@ -12,7 +12,7 @@ import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
-import { FieldRenderProps, initialValues, UserName } from './form-values';
+import { initialValues, UserName } from './form-values';
 
 const ModalWindow: FC = () => {
   const { user } = useAppSelector((state) => state.boardSlice);
@@ -30,14 +30,6 @@ const ModalWindow: FC = () => {
   );
 
   const onClose = () => setModal(false);
-
-  // const addUserNameAndCloseModal = () => {
-  //   if (formRef.current) {
-  //     const { values } = formRef.current.getState();
-  //     addUserNameFunction(values);
-  //   }
-  //   onClose();
-  // };
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -67,35 +59,33 @@ const ModalWindow: FC = () => {
     onClose();
   };
 
-  const UserNameForm: FC<FieldRenderProps> = () => (
-    <Form
-      onSubmit={onSubmit}
-      initialValues={initialValues}
-      render={({ form, handleSubmit }) => {
-        formRef.current = form;
-        return (
-          <form onSubmit={handleSubmit}>
-            <label>Введите ваше имя:</label>
-            <InputWrapper>
-              <Field
-                name="user"
-                placeholder="Введите имя"
-                type="text"
-                render={(props) => <input {...props.input} />}
-              />
-              <ButtonAccept type="submit">Принять</ButtonAccept>
-              <ModalClose onClick={onClose}>X</ModalClose>
-            </InputWrapper>
-          </form>
-        );
-      }}
-    />
-  );
-
   return !visible ? null : (
     <ModalWrapper onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
-        <UserNameForm onKeyDown={handleKeyDown} />
+        <Form
+          onSubmit={onSubmit}
+          initialValues={initialValues}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <form onSubmit={handleSubmit}>
+                <label>Введите ваше имя:</label>
+                <InputWrapper>
+                  <Field
+                    name="user"
+                    placeholder="Введите имя"
+                    type="text"
+                    render={(props) => (
+                      <input {...props.input} onKeyDown={handleKeyDown} />
+                    )}
+                  />
+                  <ButtonAccept type="submit">Принять</ButtonAccept>
+                  <ModalClose onClick={onClose}>X</ModalClose>
+                </InputWrapper>
+              </form>
+            );
+          }}
+        />
       </ModalContent>
     </ModalWrapper>
   );

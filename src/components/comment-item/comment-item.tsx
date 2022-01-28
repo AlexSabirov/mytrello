@@ -56,25 +56,6 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
       : updateCommentAndClose(values);
   };
 
-  const UpdateCommentForm: FC<CommentUpdateFieldProps> = () => (
-    <Form
-      onSubmit={onSubmit}
-      initialValues={initialValues}
-      render={({ form, handleSubmit }) => {
-        formRef.current = form;
-        return (
-          <CommentItemWrapper onSubmit={handleSubmit}>
-            <Field name="comment" render={(props) => <input {...props.input} />} />
-            <CommentItemButtons>
-              <button type="submit">Принять</button>
-              <button onClick={toggleComment}>X</button>
-            </CommentItemButtons>
-          </CommentItemWrapper>
-        );
-      }}
-    />
-  );
-
   return (
     <CommentWrapper>
       <CommentUser>{user}:</CommentUser>
@@ -87,15 +68,29 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
           </CommentItemButtons>
         </CommentItemWrapper>
       ) : (
-        <UpdateCommentForm onKeyDown={handleKeyDown} />
+        <Form
+          onSubmit={onSubmit}
+          initialValues={initialValues}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <CommentItemWrapper onSubmit={handleSubmit}>
+                <Field
+                  name="comment"
+                  render={(props) => <input {...props.input} onKeyDown={handleKeyDown} />}
+                />
+                <CommentItemButtons>
+                  <button type="submit">Принять</button>
+                  <button onClick={toggleComment}>X</button>
+                </CommentItemButtons>
+              </CommentItemWrapper>
+            );
+          }}
+        />
       )}
     </CommentWrapper>
   );
 };
-
-interface CommentUpdateFieldProps {
-  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
-}
 
 const CommentWrapper = styled.div`
   padding: 5px 3px;

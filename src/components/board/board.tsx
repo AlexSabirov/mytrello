@@ -1,16 +1,11 @@
-import { FC, KeyboardEventHandler, useCallback, useRef } from 'react';
+import { FC, useCallback, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { useAppDispatch } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import ColumnList from '../column-list';
-import {
-  BoardForm,
-  ColumnName,
-  ColumnNameRenderProps,
-  initialValues,
-} from './form-values';
+import { BoardForm, ColumnName, initialValues } from './form-values';
 
 const BoardItem: FC = () => {
   const formRef = useRef<BoardForm>();
@@ -24,46 +19,46 @@ const BoardItem: FC = () => {
     [dispatch, addColumn],
   );
 
-  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') {
-      if (formRef.current) {
-        const { values } = formRef.current.getState();
-        addColumnFunction(values);
-        formRef.current.change('column', '');
-      }
-    }
-  };
+  // const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
+  //   if (e.key === 'Enter') {
+  //     if (formRef.current) {
+  //       const { values } = formRef.current.getState();
+  //       addColumnFunction(values);
+  //       formRef.current.change('column', '');
+  //     }
+  //   }
+  // };
 
   const onSubmit = (values: ColumnName, form: BoardForm) => {
     !values.column ? addColumnFunction(initialValues) : addColumnFunction(values);
     form.change('column', '');
   };
 
-  const NewColumnForm: FC<ColumnNameRenderProps> = () => (
-    <Form
-      onSubmit={onSubmit}
-      render={({ form, handleSubmit }) => {
-        formRef.current = form;
-        return (
-          <form onSubmit={handleSubmit}>
-            <Field
-              name="column"
-              initialValues={initialValues}
-              render={(props) => (
-                <input {...props.input} placeholder="Введите имя колонки" />
-              )}
-            />
-            <button type="submit">Add Column</button>
-          </form>
-        );
-      }}
-    />
-  );
-
   return (
     <BoardWrapper>
       <ColumnList />
-      <NewColumnForm onKeyDown={handleKeyDown} />
+      <Form
+        onSubmit={onSubmit}
+        render={({ form, handleSubmit }) => {
+          formRef.current = form;
+          return (
+            <form onSubmit={handleSubmit}>
+              <Field
+                name="column"
+                initialValues={initialValues}
+                render={(props) => (
+                  <input
+                    {...props.input}
+                    placeholder="Введите имя колонки"
+                    // onKeyDown={handleKeyDown}
+                  />
+                )}
+              />
+              <button type="submit">Add Column</button>
+            </form>
+          );
+        }}
+      />
     </BoardWrapper>
   );
 };

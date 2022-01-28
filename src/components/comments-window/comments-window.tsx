@@ -59,36 +59,33 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
     !values.comment ? addCommentFunction(initialValues) : addCommentFunction(values);
   };
 
-  const NewCommentForm: FC<AddCommentFieldProps> = () => (
-    <Form
-      onSubmit={onSubmit}
-      render={({ form, handleSubmit }) => {
-        formRef.current = form;
-        return (
-          <CommentInputWrapper onSubmit={handleSubmit}>
-            <p>Ваш комментарий:</p>
-            <Field name="comment" render={(props) => <CommentInput {...props.input} />} />
-            <CommentButton type="submit">+</CommentButton>
-          </CommentInputWrapper>
-        );
-      }}
-    />
-  );
-
   return !visible ? null : (
     <ModalWindowWrapper onClick={onClose}>
       <ModalWindowContent onClick={(e) => e.stopPropagation()}>
-        <NewCommentForm onKeyDown={handleKeyDown} />
+        <Form
+          onSubmit={onSubmit}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <CommentInputWrapper onSubmit={handleSubmit}>
+                <p>Ваш комментарий:</p>
+                <Field
+                  name="comment"
+                  render={(props) => (
+                    <CommentInput {...props.input} onKeyDown={handleKeyDown} />
+                  )}
+                />
+                <CommentButton type="submit">+</CommentButton>
+              </CommentInputWrapper>
+            );
+          }}
+        />
         <CommentWindowCloseButton onClick={onClose}>X</CommentWindowCloseButton>
         <CommentsList columnId={columnId} cardId={cardId} />
       </ModalWindowContent>
     </ModalWindowWrapper>
   );
 };
-
-interface AddCommentFieldProps {
-  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
-}
 
 const ModalWindowWrapper = styled.div`
   position: fixed;
