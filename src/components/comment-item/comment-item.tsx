@@ -1,4 +1,3 @@
-import { FormApi } from 'final-form';
 import { FC, KeyboardEventHandler, useCallback, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
@@ -6,6 +5,7 @@ import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Comment } from '../../types/data';
+import { CommentForm, CommentUpdate } from './form-values';
 
 interface CommentProps {
   columnId: string;
@@ -19,7 +19,7 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
   const { user } = useAppSelector((state) => state.boardSlice);
   const { updateComment, removeComment } = boardSlice.actions;
   const dispatch = useAppDispatch();
-  const formRef = useRef<FormApi<CommentUpdate, Partial<CommentUpdate>>>();
+  const formRef = useRef<CommentForm>();
 
   const updateCommentFunction = useCallback(
     (values: CommentUpdate) => {
@@ -95,10 +95,6 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
 
 interface CommentUpdateFieldProps {
   onKeyDown: KeyboardEventHandler<HTMLInputElement>;
-}
-
-interface CommentUpdate {
-  comment: string;
 }
 
 const CommentWrapper = styled.div`

@@ -1,4 +1,3 @@
-import { FormApi } from 'final-form';
 import { FC, KeyboardEventHandler, useCallback, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
@@ -7,6 +6,7 @@ import { useAppDispatch } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Card } from '../../types/data';
 import CommentsWindow from '../comments-window';
+import { CardForm, CardUpdate, CardUpdateFieldProps } from './form-values';
 
 interface CardProps {
   columnId: string;
@@ -22,7 +22,7 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
   const [visibleCard, setVisibleCard] = useState(true);
   const { updateCard, removeCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
-  const formRef = useRef<FormApi<CardUpdate, Partial<CardUpdate>>>();
+  const formRef = useRef<CardForm>();
 
   const updateCardFunction = useCallback(
     (values: CardUpdate) => {
@@ -99,14 +99,6 @@ const CardItem: FC<CardProps> = ({ columnId, card }) => {
     </CardWrapper>
   );
 };
-
-interface CardUpdate {
-  card: string;
-}
-
-interface CardUpdateFieldProps {
-  onKeyDown: KeyboardEventHandler<HTMLInputElement>;
-}
 
 const CardWrapper = styled.div`
   margin-bottom: 5px;

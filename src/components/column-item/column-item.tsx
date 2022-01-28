@@ -1,4 +1,3 @@
-import { FormApi } from 'final-form';
 import {
   FC,
   KeyboardEventHandler,
@@ -14,7 +13,13 @@ import { useAppDispatch } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Columns } from '../../types/data';
 import CardList from '../card-list';
-import { CardName, initialValuesCardAdd } from './form-values';
+import {
+  CardForm,
+  CardName,
+  ColumnForm,
+  ColumnNameUpdate,
+  initialValuesCardAdd,
+} from './form-values';
 
 interface ColumnProps {
   column: Columns;
@@ -26,8 +31,8 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
   const dispatch = useAppDispatch();
 
   const [visibleTitle, setVisibleTitle] = useState(true);
-  const formRefCard = useRef<FormApi<CardName, Partial<CardName>>>();
-  const formRefColumn = useRef<FormApi<ColumnNameUpdate, Partial<ColumnNameUpdate>>>();
+  const formRefCard = useRef<CardForm>();
+  const formRefColumn = useRef<ColumnForm>();
 
   const addCardFunction = useCallback(
     (values) => {
@@ -157,10 +162,6 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     </ColumnWrapper>
   );
 };
-
-interface ColumnNameUpdate {
-  columns: string;
-}
 
 interface CardAddFieldProps {
   onKeyDown: KeyboardEventHandler<HTMLInputElement>;

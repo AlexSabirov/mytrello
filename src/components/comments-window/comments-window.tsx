@@ -1,4 +1,3 @@
-import { FormApi } from 'final-form';
 import { FC, KeyboardEventHandler, useCallback, useEffect, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
@@ -7,6 +6,7 @@ import { useAppDispatch } from '../../redux/hooks/redux';
 import { boardSlice } from '../../redux/store/reducers/board-reducer';
 import { Modal } from '../../types/data';
 import CommentsList from '../comments-list';
+import { CommentForm, CommentName } from './form-values';
 
 interface CommentsWindowProps extends Modal {
   columnId: string;
@@ -21,7 +21,7 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { addComment } = boardSlice.actions;
-  const formRef = useRef<FormApi<CommentName, Partial<CommentName>>>();
+  const formRef = useRef<CommentForm>();
 
   const addCommentFunction = useCallback(
     (values) => {
@@ -85,10 +85,6 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
     </ModalWindowWrapper>
   );
 };
-
-interface CommentName {
-  comment: string;
-}
 
 interface AddCommentFieldProps {
   onKeyDown: KeyboardEventHandler<HTMLInputElement>;
