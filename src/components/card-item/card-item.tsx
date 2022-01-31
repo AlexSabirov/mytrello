@@ -1,12 +1,13 @@
-import { FC, KeyboardEventHandler, useCallback, useRef, useState } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { useAppDispatch } from '../../redux/hooks/redux';
-// import { useToggle } from '../../redux/hooks/useToggle';
-import { boardSlice } from '../../redux/store/reducers/board-reducer';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch } from '../../store/hooks/redux';
+import { useToggle } from '../../store/hooks/useToggle';
 import { Card } from '../../types/data';
 import CommentsWindow from '../comments-window';
+import UiModal from '../ui-modal';
 import { CardForm, CardUpdate } from './form-values';
 
 interface CardItemProps {
@@ -16,14 +17,17 @@ interface CardItemProps {
 }
 
 const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
-  const [isModalComment, setModalComment] = useState(false);
-  const onOpen = () => setModalComment(true);
-  const onClose = () => setModalComment(false);
-  const [visibleCard, setVisibleCard] = useState(true);
+  const onOpen = () => updateVisibleModal(true);
+  const onClose = () => updateVisibleModal(false);
   const { updateCard, removeCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
   const formRef = useRef<CardForm>();
-  // const toggleCard = useToggle();
+  const { visible, toggle, close } = useToggle();
+  const [visibleModal, setVisibleModal] = useState(false);
+
+  const updateVisibleModal = useCallback((value: boolean) => {
+    setVisibleModal(value);
+  }, []);
 
   const updateCardFunction = useCallback(
     (values: CardUpdate) => {
@@ -34,17 +38,7 @@ const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
 
   const updateCardAndClose = (values: CardUpdate) => {
     updateCardFunction(!values.card ? initialValues : values);
-    toggleCard();
-  };
-
-  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') {
-      onSubmit;
-    }
-  };
-
-  const toggleCard = () => {
-    setVisibleCard((state) => !state);
+    close();
   };
 
   const removeCardFunction = useCallback(() => {
@@ -59,11 +53,11 @@ const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
 
   return (
     <CardWrapper>
-      {visibleCard ? (
+      {visible ? (
         <CardItemWrapper>
           <CardItemTitle onClick={onOpen}>{card.title}</CardItemTitle>
           <CardItemButtons>
-            <button onClick={toggleCard}>Edit</button>
+            <button onClick={toggle}>Edit</button>
             <button onClick={removeCardFunction}>Del</button>
           </CardItemButtons>
         </CardItemWrapper>
@@ -75,30 +69,25 @@ const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
             formRef.current = form;
             return (
               <CardItemWrapper onSubmit={handleSubmit}>
-                <Field
-                  name="card"
-                  render={(props) => <input {...props.input} onKeyDown={handleKeyDown} />}
-                />
+                <Field name="card" render={(props) => <input {...props.input} />} />
                 <CardItemButtons>
                   <button type="submit">Принять</button>
-                  <button onClick={toggleCard}>X</button>
+                  <button onClick={toggle}>X</button>
                 </CardItemButtons>
               </CardItemWrapper>
             );
           }}
         />
       )}
-      <CommentsWindow
-        visible={isModalComment}
-        onClose={onClose}
-        columnId={columnId}
-        cardId={cardId}
-      />
+      <UiModal visibleModal={visibleModal}>
+        <CommentsWindow onClose={onClose} columnId={columnId} cardId={cardId} />
+      </UiModal>
     </CardWrapper>
   );
 };
 
 const CardWrapper = styled.div`
+  z-index: 1;
   margin-bottom: 5px;
 `;
 

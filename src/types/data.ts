@@ -21,6 +21,5 @@ export interface Comment {
 }
 
 export interface Modal {
-  visible: boolean;
   onClose: () => void;
 }

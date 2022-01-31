@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import styled from 'styled-components';
 
-import { useAppSelector } from '../../redux/hooks/redux';
+import { useAppSelector } from '../../store/hooks/redux';
 import ColumnItem from '../column-item';
 
 const ColumnList: FC = () => {

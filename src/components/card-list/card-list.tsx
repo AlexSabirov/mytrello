@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useAppSelector } from '../../redux/hooks/redux';
+import { useAppSelector } from '../../store/hooks/redux';
 import CardItem from '../card-item';
 
 interface CardListProps {

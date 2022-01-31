@@ -1,7 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { v4 } from 'uuid';
 
-import { initialState } from '../../../store/state';
+import { initialState } from './state';
+import {
+  AddCard,
+  AddColumn,
+  AddComment,
+  RemoveCard,
+  RemoveColumn,
+  RemoveComment,
+  UpdateCard,
+  UpdateColumn,
+  UpdateComment,
+} from './types';
 
 export const boardSlice = createSlice({
   name: 'board',
@@ -53,62 +64,4 @@ export const boardSlice = createSlice({
   },
 });
 
-interface AddColumn {
-  title: string;
-}
-
-interface UpdateColumn {
-  columnId: string;
-  title: string;
-}
-
-interface RemoveColumn {
-  columnId: string;
-}
-
-interface AddCard {
-  title: string;
-  columnId: string;
-}
-
-interface UpdateCard {
-  columnId: string;
-  cardId: string;
-  title: string;
-}
-
-interface RemoveCard {
-  columnId: string;
-  cardId: string;
-}
-
-interface AddComment {
-  title: string;
-  columnId: string;
-  cardId: string;
-}
-
-interface UpdateComment {
-  columnId: string;
-  cardId: string;
-  commentId: string;
-  title: string;
-}
-
-interface RemoveComment {
-  columnId: string;
-  cardId: string;
-  commentId: string;
-}
-
 export default boardSlice.reducer;
-
-export const {
-  addUserName,
-  addColumn,
-  updateColumn,
-  removeColumn,
-  addCard,
-  updateCard,
-  removeCard,
-} = boardSlice.actions;

@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { Board } from '../types/data';
+import { Board } from '../../../types/data';
 
 const columnId = v4();
 const cardId = v4();

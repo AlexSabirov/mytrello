@@ -1,16 +1,25 @@
-import { FC, useCallback, useRef } from 'react';
+import { FC, useCallback, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { useAppDispatch } from '../../redux/hooks/redux';
-import { boardSlice } from '../../redux/store/reducers/board-reducer';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch, useAppSelector } from '../../store/hooks/redux';
 import ColumnList from '../column-list';
+import ModalWindow from '../modal';
+import UiModal from '../ui-modal';
 import { BoardForm, ColumnName, initialValues } from './form-values';
 
 const BoardItem: FC = () => {
+  const { user } = useAppSelector((state) => state.boardSlice);
   const formRef = useRef<BoardForm>();
   const { addColumn } = boardSlice.actions;
   const dispatch = useAppDispatch();
+
+  const [visibleModal, setVisibleModal] = useState(() => user === '');
+
+  const updateVisibleModal = useCallback((value: boolean) => {
+    setVisibleModal(value);
+  }, []);
 
   const addColumnFunction = useCallback(
     (values) => {
@@ -19,51 +28,47 @@ const BoardItem: FC = () => {
     [dispatch, addColumn],
   );
 
-  // const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-  //   if (e.key === 'Enter') {
-  //     if (formRef.current) {
-  //       const { values } = formRef.current.getState();
-  //       addColumnFunction(values);
-  //       formRef.current.change('column', '');
-  //     }
-  //   }
-  // };
-
-  const onSubmit = (values: ColumnName, form: BoardForm) => {
-    !values.column ? addColumnFunction(initialValues) : addColumnFunction(values);
+  const addColumnAndClear = (values: ColumnName, form: BoardForm) => {
+    addColumnFunction(!values.column ? initialValues : values);
     form.change('column', '');
   };
 
+  const onSubmit = (values: ColumnName, form: BoardForm) => {
+    addColumnAndClear(values, form);
+  };
+
   return (
-    <BoardWrapper>
-      <ColumnList />
-      <Form
-        onSubmit={onSubmit}
-        render={({ form, handleSubmit }) => {
-          formRef.current = form;
-          return (
-            <form onSubmit={handleSubmit}>
-              <Field
-                name="column"
-                initialValues={initialValues}
-                render={(props) => (
-                  <input
-                    {...props.input}
-                    placeholder="Введите имя колонки"
-                    // onKeyDown={handleKeyDown}
-                  />
-                )}
-              />
-              <button type="submit">Add Column</button>
-            </form>
-          );
-        }}
-      />
-    </BoardWrapper>
+    <>
+      <BoardWrapper>
+        <ColumnList />
+        <Form
+          onSubmit={onSubmit}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <form onSubmit={handleSubmit}>
+                <Field
+                  name="column"
+                  initialValues={initialValues}
+                  render={(props) => (
+                    <input {...props.input} placeholder="Введите имя колонки" />
+                  )}
+                />
+                <button type="submit">Add Column</button>
+              </form>
+            );
+          }}
+        />
+      </BoardWrapper>
+      <UiModal visibleModal={visibleModal}>
+        <ModalWindow updateVisibleModal={updateVisibleModal} />
+      </UiModal>
+    </>
   );
 };
 
 const BoardWrapper = styled.div`
+  position: relative;
   padding: 5px;
 `;
 

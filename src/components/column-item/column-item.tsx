@@ -1,16 +1,10 @@
-import {
-  FC,
-  KeyboardEventHandler,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FC, KeyboardEventHandler, useCallback, useEffect, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { useAppDispatch } from '../../redux/hooks/redux';
-import { boardSlice } from '../../redux/store/reducers/board-reducer';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch } from '../../store/hooks/redux';
+import { useToggle } from '../../store/hooks/useToggle';
 import { Columns } from '../../types/data';
 import CardList from '../card-list';
 import {
@@ -30,7 +24,7 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
   const { updateColumn, removeColumn, addCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
 
-  const [visibleTitle, setVisibleTitle] = useState(true);
+  const { visible, toggle, close } = useToggle();
   const formRefCard = useRef<CardForm>();
   const formRefColumn = useRef<ColumnForm>();
 
@@ -41,6 +35,11 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     [dispatch, addCard, columnId],
   );
 
+  const AddCardAndClear = (values: CardName, form: CardForm) => {
+    addCardFunction(!values.card ? initialValuesCardAdd : values);
+    form.change('card', '');
+  };
+
   const updateColumnFunction = useCallback(
     (values) => {
       dispatch(updateColumn({ title: values['columns'], columnId }));
@@ -49,8 +48,8 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
   );
 
   const updateColumnAndClose = (values: ColumnNameUpdate) => {
-    updateColumnFunction(values);
-    toggleTitle();
+    updateColumnFunction(!values.columns ? initialValuesColumnUpdate : values);
+    toggle();
   };
 
   const handleKeyDownAddCard: KeyboardEventHandler<HTMLInputElement> = (e) => {
@@ -59,12 +58,6 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     }
   };
 
-  const toggleTitle = () => {
-    visibleTitle ? setVisibleTitle(false) : setVisibleTitle(true);
-  };
-
-  const closeTitle = () => setVisibleTitle(true);
-
   const removeColumnFunction = useCallback(() => {
     dispatch(removeColumn({ columnId }));
   }, [dispatch, removeColumn, columnId]);
@@ -72,7 +65,7 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
-        closeTitle();
+        close();
         break;
     }
   };
@@ -82,25 +75,22 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
   });
 
   const columnUpdateSubmit = (values: ColumnNameUpdate) => {
-    !values.columns
-      ? updateColumnAndClose(initialValuesColumnUpdate)
-      : updateColumnAndClose(values);
+    updateColumnAndClose(values);
   };
 
   const initialValuesColumnUpdate = { columns: column.title };
 
   const newCardSubmit = (values: CardName, form: CardForm) => {
-    !values.card ? addCardFunction(initialValuesCardAdd) : addCardFunction(values);
-    form.change('card', '');
+    AddCardAndClear(values, form);
   };
 
   return (
     <ColumnWrapper>
       <ColumnButtonsWrapper>
-        {visibleTitle ? (
+        {visible ? (
           <ColumnTitleWrapper>
-            <ColumnTitle onDoubleClick={toggleTitle}>{column.title}</ColumnTitle>
-            <ButtonTitle onClick={toggleTitle}>Edit</ButtonTitle>
+            <ColumnTitle onDoubleClick={toggle}>{column.title}</ColumnTitle>
+            <ButtonTitle onClick={toggle}>Edit</ButtonTitle>
           </ColumnTitleWrapper>
         ) : (
           <Form
@@ -112,7 +102,7 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
                 <UpdateColumnWrapper onSubmit={handleSubmit}>
                   <Field name="columns" render={(props) => <input {...props.input} />} />
                   <ButtonUpdateTitle type="submit">ОК</ButtonUpdateTitle>
-                  <ButtonTitle onClick={toggleTitle}>х</ButtonTitle>
+                  <ButtonTitle onClick={toggle}>х</ButtonTitle>
                 </UpdateColumnWrapper>
               );
             }}

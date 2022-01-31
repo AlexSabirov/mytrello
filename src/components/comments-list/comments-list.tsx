@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import styled from 'styled-components';
 
-import { useAppSelector } from '../../redux/hooks/redux';
+import { useAppSelector } from '../../store/hooks/redux';
 import CommentItem from '../comment-item';
 interface CommentsListProps {
   columnId: string;
@@ -32,6 +32,7 @@ const CommentsListWrapper = styled.div`
   padding: 5px;
   border: 1px solid blue;
   background-color: #f0f0f0;
+  z-index: 14;
 `;
 
 export default CommentsList;

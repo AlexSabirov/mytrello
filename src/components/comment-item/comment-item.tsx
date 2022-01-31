@@ -1,9 +1,10 @@
-import { FC, KeyboardEventHandler, useCallback, useRef, useState } from 'react';
+import { FC, useCallback, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { useAppDispatch, useAppSelector } from '../../redux/hooks/redux';
-import { boardSlice } from '../../redux/store/reducers/board-reducer';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch, useAppSelector } from '../../store/hooks/redux';
+import { useToggle } from '../../store/hooks/useToggle';
 import { Comment } from '../../types/data';
 import { CommentForm, CommentUpdate } from './form-values';
 
@@ -15,7 +16,7 @@ interface CommentProps {
 
 const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
   const { id: commentId } = comment;
-  const [visible, setVisible] = useState(true);
+  const { visible, toggle } = useToggle();
   const { user } = useAppSelector((state) => state.boardSlice);
   const { updateComment, removeComment } = boardSlice.actions;
   const dispatch = useAppDispatch();
@@ -29,20 +30,9 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
   );
 
   const updateCommentAndClose = (values: CommentUpdate) => {
-    updateCommentFunction(values);
-    toggleComment();
+    updateCommentFunction(!values.comment ? initialValues : values);
+    toggle();
   };
-
-  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') {
-      if (formRef.current) {
-        const { values } = formRef.current.getState();
-        updateCommentAndClose(values);
-      }
-    }
-  };
-
-  const toggleComment = () => (visible ? setVisible(false) : setVisible(true));
 
   const removeCommentFunction = useCallback(() => {
     dispatch(removeComment({ columnId, cardId, commentId }));
@@ -51,9 +41,7 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
   const initialValues = { comment: comment.title };
 
   const onSubmit = (values: CommentUpdate) => {
-    !values.comment
-      ? updateCommentAndClose(initialValues)
-      : updateCommentAndClose(values);
+    updateCommentAndClose(values);
   };
 
   return (
@@ -61,9 +49,9 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
       <CommentUser>{user}:</CommentUser>
       {visible ? (
         <CommentItemWrapper>
-          <div onDoubleClick={toggleComment}>{comment.title}</div>
+          <div onDoubleClick={toggle}>{comment.title}</div>
           <CommentItemButtons>
-            <button onClick={toggleComment}>Edit</button>
+            <button onClick={toggle}>Edit</button>
             <button onClick={removeCommentFunction}>Del</button>
           </CommentItemButtons>
         </CommentItemWrapper>
@@ -75,13 +63,10 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
             formRef.current = form;
             return (
               <CommentItemWrapper onSubmit={handleSubmit}>
-                <Field
-                  name="comment"
-                  render={(props) => <input {...props.input} onKeyDown={handleKeyDown} />}
-                />
+                <Field name="comment" render={(props) => <input {...props.input} />} />
                 <CommentItemButtons>
                   <button type="submit">Принять</button>
-                  <button onClick={toggleComment}>X</button>
+                  <button onClick={toggle}>X</button>
                 </CommentItemButtons>
               </CommentItemWrapper>
             );

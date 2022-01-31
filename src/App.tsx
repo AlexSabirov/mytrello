@@ -4,8 +4,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { createGlobalStyle } from 'styled-components';
 
 import BoardItem from './components/board';
-import ModalWindow from './components/modal';
-import { persistor, store } from './redux/store/store';
+import { persistor, store } from './store/store';
 
 const App: FC = () => {
   return (
@@ -14,7 +13,6 @@ const App: FC = () => {
         <PersistGate loading={null} persistor={persistor}>
           <Global />
           <BoardItem />
-          <ModalWindow />
         </PersistGate>
       </Provider>
     </>

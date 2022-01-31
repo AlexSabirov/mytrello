@@ -2,7 +2,7 @@ import { combineReducers, configureStore, createStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-import boardSlice from './reducers/board-reducer';
+import boardSlice from './ducks/board/slice';
 
 const rootReducer = combineReducers({ boardSlice });
 

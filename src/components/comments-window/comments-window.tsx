@@ -1,9 +1,9 @@
-import { FC, KeyboardEventHandler, useCallback, useEffect, useRef } from 'react';
+import { FC, useCallback, useEffect, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { useAppDispatch } from '../../redux/hooks/redux';
-import { boardSlice } from '../../redux/store/reducers/board-reducer';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch } from '../../store/hooks/redux';
 import { Modal } from '../../types/data';
 import CommentsList from '../comments-list';
 import { CommentForm, CommentName } from './form-values';
@@ -13,12 +13,7 @@ interface CommentsWindowProps extends Modal {
   cardId: string;
 }
 
-const CommentsWindow: FC<CommentsWindowProps> = ({
-  columnId,
-  cardId,
-  visible = false,
-  onClose,
-}) => {
+const CommentsWindow: FC<CommentsWindowProps> = ({ columnId, cardId, onClose }) => {
   const dispatch = useAppDispatch();
   const { addComment } = boardSlice.actions;
   const formRef = useRef<CommentForm>();
@@ -29,17 +24,10 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
     },
     [dispatch, addComment, columnId, cardId],
   );
-
-  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') {
-      if (formRef.current) {
-        const { values } = formRef.current.getState();
-        addCommentFunction(values);
-        formRef.current.change('comment', '');
-      }
-    }
+  const addCommentAndClear = (values: CommentName, form: CommentForm) => {
+    addCommentFunction(!values.comment ? initialValues : values);
+    form.change('comment', '');
   };
-
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
@@ -55,11 +43,11 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
 
   const initialValues = { comment: 'New Comment' };
 
-  const onSubmit = (values: CommentName) => {
-    !values.comment ? addCommentFunction(initialValues) : addCommentFunction(values);
+  const onSubmit = (values: CommentName, form: CommentForm) => {
+    addCommentAndClear(values, form);
   };
 
-  return !visible ? null : (
+  return (
     <ModalWindowWrapper onClick={onClose}>
       <ModalWindowContent onClick={(e) => e.stopPropagation()}>
         <Form
@@ -71,9 +59,7 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
                 <p>Ваш комментарий:</p>
                 <Field
                   name="comment"
-                  render={(props) => (
-                    <CommentInput {...props.input} onKeyDown={handleKeyDown} />
-                  )}
+                  render={(props) => <CommentInput {...props.input} />}
                 />
                 <CommentButton type="submit">+</CommentButton>
               </CommentInputWrapper>
@@ -88,10 +74,12 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
 };
 
 const ModalWindowWrapper = styled.div`
-  position: fixed;
-  z-index: 10;
+  position: absolute;
+  z-index: 14;
+  overflow: hidden;
   width: 100%;
   height: 100%;
+  opacity: 0.7;
   top: 0;
   left: 0;
   background-color: rgba(255, 255, 255, 0.6);
