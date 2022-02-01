@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef } from 'react';
+import { FC, useCallback, useMemo, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -38,7 +38,7 @@ const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
     dispatch(removeComment({ columnId, cardId, commentId }));
   }, [dispatch, removeComment, columnId, cardId, commentId]);
 
-  const initialValues = { comment: comment.title };
+  const initialValues = useMemo(() => ({ comment: comment.title }), [comment.title]);
 
   const onSubmit = (values: CommentUpdate) => {
     updateCommentAndClose(values);

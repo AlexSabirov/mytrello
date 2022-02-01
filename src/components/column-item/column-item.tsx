@@ -1,4 +1,4 @@
-import { FC, KeyboardEventHandler, useCallback, useEffect, useRef } from 'react';
+import { FC, KeyboardEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -78,7 +78,10 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     updateColumnAndClose(values);
   };
 
-  const initialValuesColumnUpdate = { columns: column.title };
+  const initialValuesColumnUpdate = useMemo(
+    () => ({ columns: column.title }),
+    [column.title],
+  );
 
   const newCardSubmit = (values: CardName, form: CardForm) => {
     AddCardAndClear(values, form);

@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from 'react';
+import { FC, useCallback, useMemo, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -45,7 +45,7 @@ const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
     dispatch(removeCard({ columnId, cardId }));
   }, [dispatch, removeCard, columnId, cardId]);
 
-  const initialValues = { card: card.title };
+  const initialValues = useMemo(() => ({ card: card.title }), [card.title]);
 
   const onSubmit = (values: CardUpdate) => {
     updateCardAndClose(values);
