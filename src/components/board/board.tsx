@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -9,7 +9,7 @@ import ModalWindow from '../modal';
 import UiModal from '../ui-modal';
 import { BoardForm, ColumnName, initialValues } from './form-values';
 
-const BoardItem: FC = () => {
+const BoardItem = function (): JSX.Element {
   const { user } = useAppSelector((state) => state.boardSlice);
   const formRef = useRef<BoardForm>();
   const { addColumn } = boardSlice.actions;

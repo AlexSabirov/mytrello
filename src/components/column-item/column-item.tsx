@@ -24,7 +24,7 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
   const { updateColumn, removeColumn, addCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
 
-  const { visible, toggle, close } = useToggle();
+  const { visible, toggle, close } = useToggle(true);
   const formRefCard = useRef<CardForm>();
   const formRefColumn = useRef<ColumnForm>();
 

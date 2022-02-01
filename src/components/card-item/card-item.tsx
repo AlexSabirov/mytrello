@@ -22,7 +22,7 @@ const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
   const { updateCard, removeCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
   const formRef = useRef<CardForm>();
-  const { visible, toggle, close } = useToggle();
+  const { visible, toggle, close } = useToggle(true);
   const [visibleModal, setVisibleModal] = useState(false);
 
   const updateVisibleModal = useCallback((value: boolean) => {

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
-const useToggle = () => {
-  const [visible, setVisible] = useState(true);
+export const useToggle = (value: boolean) => {
+  const [visible, setVisible] = useState(value);
   const toggle = useCallback(() => {
     setVisible((visible) => !visible);
   }, [setVisible]);
@@ -13,5 +13,3 @@ const useToggle = () => {
   }, [setVisible]);
   return { visible, toggle, close, open };
 };
-
-export { useToggle };

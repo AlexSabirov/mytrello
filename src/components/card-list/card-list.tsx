@@ -1,5 +1,6 @@
 import { FC } from 'react';
 
+import { selectorCards } from '../../store/ducks/board/selectors';
 import { useAppSelector } from '../../store/hooks/redux';
 import CardItem from '../card-item';
 
@@ -8,7 +9,7 @@ interface CardListProps {
 }
 
 const CardList: FC<CardListProps> = ({ columnId }) => {
-  const { cards } = useAppSelector((state) => state.boardSlice.columns[columnId]);
+  const { cards } = useAppSelector(selectorCards)[columnId];
 
   return (
     <div>

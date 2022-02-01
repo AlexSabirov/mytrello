@@ -16,7 +16,7 @@ interface CommentProps {
 
 const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
   const { id: commentId } = comment;
-  const { visible, toggle } = useToggle();
+  const { visible, toggle } = useToggle(true);
   const { user } = useAppSelector((state) => state.boardSlice);
   const { updateComment, removeComment } = boardSlice.actions;
   const dispatch = useAppDispatch();
