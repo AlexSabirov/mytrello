@@ -9,7 +9,7 @@ interface CardListProps {
 }
 
 const CardList: FC<CardListProps> = ({ columnId }) => {
-  const { cards } = useAppSelector(selectorCards)[columnId];
+  const { cards } = useAppSelector(selectorCards(columnId));
 
   return (
     <div>

@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import styled from 'styled-components';
 
+import { selectorComments } from '../../store/ducks/board/selectors';
 import { useAppSelector } from '../../store/hooks/redux';
 import CommentItem from '../comment-item';
 interface CommentsListProps {
@@ -9,9 +10,7 @@ interface CommentsListProps {
 }
 
 const CommentsList: FC<CommentsListProps> = ({ columnId, cardId }) => {
-  const { comments } = useAppSelector(
-    (state) => state.boardSlice.columns[columnId].cards[cardId],
-  );
+  const { comments } = useAppSelector(selectorComments(columnId, cardId));
   return (
     <CommentsListWrapper>
       {Object.values(comments).map((comment) => (
