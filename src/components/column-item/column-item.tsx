@@ -1,86 +1,71 @@
-import {
-  FC,
-  KeyboardEventHandler,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { KeyboardEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch } from '../../store/hooks/redux';
+import { useToggle } from '../../store/hooks/useToggle';
 import { Columns } from '../../types/data';
 import CardList from '../card-list';
+import {
+  CardForm,
+  CardName,
+  ColumnForm,
+  ColumnNameUpdate,
+  initialValuesCardAdd,
+} from './form-values';
+
 interface ColumnProps {
   column: Columns;
 }
 
-const ColumnItem: FC<ColumnProps> = ({ column }) => {
+const ColumnItem = function ({ column }: ColumnProps): JSX.Element {
   const { id: columnId } = column;
-  const [, dispatch] = useContext(BoardContext);
-  const [value, setValue] = useState('');
-  const [valueUpdate, setValueUpdate] = useState(column.title);
-  const [visibleTitle, setVisibleTitle] = useState(true);
+  const { updateColumn, removeColumn, addCard } = boardSlice.actions;
+  const dispatch = useAppDispatch();
 
-  const addCard = useCallback(() => {
-    dispatch({ type: BoardActionTypes.AddCard, payload: { title: value, columnId } });
-  }, [dispatch, value, columnId]);
+  const { visible, toggle, close } = useToggle(true);
+  const formRefCard = useRef<CardForm>();
+  const formRefColumn = useRef<ColumnForm>();
 
-  const clearInput = () => {
-    setValue('');
+  const addCardFunction = useCallback(
+    (values) => {
+      dispatch(addCard({ title: values['card'], columnId }));
+    },
+    [dispatch, addCard, columnId],
+  );
+
+  const AddCardAndClear = (values: CardName, form: CardForm) => {
+    addCardFunction(!values.card ? initialValuesCardAdd : values);
+    form.change('card', '');
   };
 
-  const addCardAndClearInput = () => {
-    if (value === '') {
-      return;
-    }
-    addCard();
-    clearInput();
-  };
+  const updateColumnFunction = useCallback(
+    (values) => {
+      dispatch(updateColumn({ title: values['columns'], columnId }));
+    },
+    [dispatch, updateColumn, columnId],
+  );
 
-  const updateColumn = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.UpdateColumn,
-      payload: { title: valueUpdate, columnId },
-    });
-  }, [dispatch, valueUpdate, columnId]);
-
-  const updateColumnAndClose = () => {
-    if (valueUpdate === '') return;
-    updateColumn();
-    toggleTitle();
+  const updateColumnAndClose = (values: ColumnNameUpdate) => {
+    updateColumnFunction(!values.columns ? initialValuesColumnUpdate : values);
+    toggle();
   };
 
   const handleKeyDownAddCard: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (e.key === 'Enter') {
-      addCardAndClearInput();
+      newCardSubmit;
     }
   };
 
-  const handleKeyDownUpdateColumn: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') {
-      updateColumnAndClose();
-    }
-  };
-
-  const toggleTitle = () => {
-    visibleTitle ? setVisibleTitle(false) : setVisibleTitle(true);
-  };
-
-  const closeTitle = () => setVisibleTitle(true);
-
-  const removeColumn = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.RemoveColumn,
-      payload: { columnId },
-    });
-  }, [dispatch, columnId]);
+  const removeColumnFunction = useCallback(() => {
+    dispatch(removeColumn({ columnId }));
+  }, [dispatch, removeColumn, columnId]);
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
-        closeTitle();
+        close();
         break;
     }
   };
@@ -89,38 +74,67 @@ const ColumnItem: FC<ColumnProps> = ({ column }) => {
     return () => document.removeEventListener('keydown', onKeydown);
   });
 
+  const columnUpdateSubmit = (values: ColumnNameUpdate) => {
+    updateColumnAndClose(values);
+  };
+
+  const initialValuesColumnUpdate = useMemo(
+    () => ({ columns: column.title }),
+    [column.title],
+  );
+
+  const newCardSubmit = (values: CardName, form: CardForm) => {
+    AddCardAndClear(values, form);
+  };
+
   return (
     <ColumnWrapper>
       <ColumnButtonsWrapper>
-        {visibleTitle ? (
+        {visible ? (
           <ColumnTitleWrapper>
-            <ColumnTitle onDoubleClick={toggleTitle}>{column.title}</ColumnTitle>
-            <ButtonTitle onClick={toggleTitle}>Edit</ButtonTitle>
+            <ColumnTitle onDoubleClick={toggle}>{column.title}</ColumnTitle>
+            <ButtonTitle onClick={toggle}>Edit</ButtonTitle>
           </ColumnTitleWrapper>
         ) : (
-          <UpdateColumnWrapper>
-            <input
-              value={valueUpdate}
-              onChange={(e) => {
-                setValueUpdate(e.target.value);
-              }}
-              onKeyDown={handleKeyDownUpdateColumn}
-            />
-            <ButtonUpdateTitle onClick={updateColumnAndClose}>ОК</ButtonUpdateTitle>
-            <ButtonTitle onClick={toggleTitle}>х</ButtonTitle>
-          </UpdateColumnWrapper>
-        )}
-        <ColumnInputWrapper>
-          <ColumnInput
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDownAddCard}
+          <Form
+            onSubmit={columnUpdateSubmit}
+            initialValues={initialValuesColumnUpdate}
+            render={({ form, handleSubmit }) => {
+              formRefColumn.current = form;
+              return (
+                <UpdateColumnWrapper onSubmit={handleSubmit}>
+                  <Field name="columns" render={(props) => <input {...props.input} />} />
+                  <ButtonUpdateTitle type="submit">ОК</ButtonUpdateTitle>
+                  <ButtonTitle onClick={toggle}>х</ButtonTitle>
+                </UpdateColumnWrapper>
+              );
+            }}
           />
-          <ColumnButton onClick={addCardAndClearInput}>+</ColumnButton>
-        </ColumnInputWrapper>
+        )}
+        <Form
+          onSubmit={newCardSubmit}
+          render={({ form, handleSubmit }) => {
+            formRefCard.current = form;
+            return (
+              <ColumnInputWrapper onSubmit={handleSubmit}>
+                <Field
+                  name="card"
+                  render={(props) => (
+                    <ColumnInput
+                      {...props.input}
+                      placeholder="Введите имя карточки"
+                      onKeyDown={handleKeyDownAddCard}
+                    />
+                  )}
+                />
+                <ColumnButton type="submit">+</ColumnButton>
+              </ColumnInputWrapper>
+            );
+          }}
+        />
       </ColumnButtonsWrapper>
       <CardList columnId={columnId} />
-      <RemoveColumnButton onClick={removeColumn}>X</RemoveColumnButton>
+      <RemoveColumnButton onClick={removeColumnFunction}>X</RemoveColumnButton>
     </ColumnWrapper>
   );
 };
@@ -151,7 +165,7 @@ const ButtonTitle = styled.button`
   padding: 0 5px;
 `;
 
-const UpdateColumnWrapper = styled.div`
+const UpdateColumnWrapper = styled.form`
   min-height: 55px;
   display: flex;
   padding: 10px 5px;
@@ -167,7 +181,7 @@ const ColumnButtonsWrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-const ColumnInputWrapper = styled.div`
+const ColumnInputWrapper = styled.form`
   display: flex;
   margin-bottom: 5px;
   border: 1px solid rgb(0, 0, 0);

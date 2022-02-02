@@ -1,18 +1,27 @@
-import { FC } from 'react';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import { createGlobalStyle } from 'styled-components';
 
 import BoardItem from './components/board';
-import ModalWindow from './components/modal';
-import BoardProvider from './providers/board/board-providers';
+import { persistor, store } from './store/store';
 
-const App: FC = () => {
+const App = function (): JSX.Element {
   return (
     <>
+<<<<<<< HEAD
       <Global />
       <BoardProvider>
         <BoardItem />
         <ModalWindow />
       </BoardProvider>
+=======
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <Global />
+          <BoardItem />
+        </PersistGate>
+      </Provider>
+>>>>>>> origin/finalform
     </>
   );
 };

@@ -1,17 +1,17 @@
-import { FC, useContext } from 'react';
-
-import { BoardContext } from '../../context/board/board-context';
+import { selectorCards } from '../../store/ducks/board/selectors';
+import { useAppSelector } from '../../store/hooks/redux';
 import CardItem from '../card-item';
 
 interface CardListProps {
   columnId: string;
 }
 
-const CardList: FC<CardListProps> = ({ columnId }) => {
-  const [state] = useContext(BoardContext);
+const CardList = function ({ columnId }: CardListProps): JSX.Element {
+  const { cards } = useAppSelector(selectorCards(columnId));
+
   return (
     <div>
-      {Object.values(state.columns?.[columnId]?.cards || []).map((card) => (
+      {Object.values(cards).map((card) => (
         <CardItem
           key={card.id}
           card={card}

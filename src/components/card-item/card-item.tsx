@@ -1,82 +1,99 @@
-import { FC, useCallback, useContext, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch } from '../../store/hooks/redux';
+import { useToggle } from '../../store/hooks/useToggle';
 import { Card } from '../../types/data';
 import CommentsWindow from '../comments-window';
+import UiModal from '../ui-modal';
+import { CardForm, CardUpdate } from './form-values';
 
-interface CardProps {
+interface CardItemProps {
   columnId: string;
   cardId: string;
   card: Card;
 }
 
-const CardItem: FC<CardProps> = ({ columnId, card }) => {
-  const { id: cardId } = card;
-  const [, dispatch] = useContext(BoardContext);
-  const [isModalComment, setModalComment] = useState(false);
-  const onOpen = () => setModalComment(true);
-  const onClose = () => setModalComment(false);
-  const [value, setValue] = useState(card.title);
-  const [visibleCard, setVisibleCard] = useState(true);
+const CardItem = function ({ columnId, cardId, card }: CardItemProps): JSX.Element {
+  const { updateCard, removeCard } = boardSlice.actions;
+  const dispatch = useAppDispatch();
+  const formRef = useRef<CardForm>();
+  const { visible, toggle, close } = useToggle(true);
+  const visibleModal = useToggle(false);
 
-  const updateColumn = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.UpdateCard,
-      payload: { title: value, columnId, cardId },
-    });
-  }, [dispatch, value, columnId, cardId]);
+  const updateVisibleModal = useCallback(() => {
+    visibleModal.toggle();
+  }, [visibleModal]);
 
-  const updateColumnAndClose = () => {
-    updateColumn();
-    toggleCard();
+  const updateCardFunction = useCallback(
+    (values: CardUpdate) => {
+      dispatch(updateCard({ title: values['card'], columnId, cardId }));
+    },
+    [dispatch, updateCard, columnId, cardId],
+  );
+
+  const updateCardAndClose = (values: CardUpdate) => {
+    updateCardFunction(!values.card ? initialValues : values);
+    close();
   };
 
-  const toggleCard = () => {
-    visibleCard ? setVisibleCard(false) : setVisibleCard(true);
+  const removeCardFunction = useCallback(() => {
+    dispatch(removeCard({ columnId, cardId }));
+  }, [dispatch, removeCard, columnId, cardId]);
+
+  const initialValues = useMemo(() => ({ card: card.title }), [card.title]);
+
+  const onSubmit = (values: CardUpdate) => {
+    updateCardAndClose(values);
   };
-  const removeCard = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.RemoveCard,
-      payload: { columnId, cardId },
-    });
-  }, [dispatch, columnId, cardId]);
 
   return (
     <CardWrapper>
-      {visibleCard ? (
+      {visible ? (
         <CardItemWrapper>
-          <CardItemTitle onClick={onOpen}>{card.title}</CardItemTitle>
+          <CardItemTitle onClick={updateVisibleModal}>{card.title}</CardItemTitle>
           <CardItemButtons>
-            <button onClick={toggleCard}>Edit</button>
-            <button onClick={removeCard}>Del</button>
+            <button onClick={toggle}>Edit</button>
+            <button onClick={removeCardFunction}>Del</button>
           </CardItemButtons>
         </CardItemWrapper>
       ) : (
-        <CardItemWrapper>
-          <input value={value} onChange={(e) => setValue(e.target.value)} />
-          <CardItemButtons>
-            <button onClick={updateColumnAndClose}>Принять</button>
-            <button onClick={toggleCard}>X</button>
-          </CardItemButtons>
-        </CardItemWrapper>
+        <Form
+          onSubmit={onSubmit}
+          initialValues={initialValues}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <CardItemWrapper onSubmit={handleSubmit}>
+                <Field name="card" render={(props) => <input {...props.input} />} />
+                <CardItemButtons>
+                  <button type="submit">Принять</button>
+                  <button onClick={toggle}>X</button>
+                </CardItemButtons>
+              </CardItemWrapper>
+            );
+          }}
+        />
       )}
-      <CommentsWindow
-        visible={isModalComment}
-        onClose={onClose}
-        columnId={columnId}
-        cardId={cardId}
-      />
+      <UiModal visibleModal={visibleModal.visible}>
+        <CommentsWindow
+          updateVisibleModal={updateVisibleModal}
+          columnId={columnId}
+          cardId={cardId}
+        />
+      </UiModal>
     </CardWrapper>
   );
 };
 
 const CardWrapper = styled.div`
+  z-index: 1;
   margin-bottom: 5px;
 `;
 
-const CardItemWrapper = styled.div`
+const CardItemWrapper = styled.form`
   display: flex;
 `;
 

@@ -1,50 +1,41 @@
-import { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
-import { BoardContext } from '../../context/board/board-context';
-import { BoardActionTypes } from '../../store/actions-type';
+import { boardSlice } from '../../store/ducks/board/';
+import { useAppDispatch } from '../../store/hooks/redux';
 import { Modal } from '../../types/data';
 import CommentsList from '../comments-list';
+import { CommentForm, CommentName } from './form-values';
 
 interface CommentsWindowProps extends Modal {
   columnId: string;
   cardId: string;
 }
 
-const CommentsWindow: FC<CommentsWindowProps> = ({
+const CommentsWindow = function ({
   columnId,
   cardId,
-  visible = false,
-  onClose,
-}) => {
-  const [value, setValue] = useState('');
-  const [, dispatch] = useContext(BoardContext);
+  updateVisibleModal,
+}: CommentsWindowProps): JSX.Element {
+  const dispatch = useAppDispatch();
+  const { addComment } = boardSlice.actions;
+  const formRef = useRef<CommentForm>();
 
-  const addComment = useCallback(() => {
-    dispatch({
-      type: BoardActionTypes.AddComment,
-      payload: { title: value, columnId, cardId },
-    });
-  }, [dispatch, value, columnId, cardId]);
-
-  const clearInput = () => setValue('');
-
-  const addCommentAndClearInput = () => {
-    if (value === '') return;
-    addComment();
-    clearInput();
+  const addCommentFunction = useCallback(
+    (values) => {
+      dispatch(addComment({ title: values['comment'], columnId, cardId }));
+    },
+    [dispatch, addComment, columnId, cardId],
+  );
+  const addCommentAndClear = (values: CommentName, form: CommentForm) => {
+    addCommentFunction(!values.comment ? initialValues : values);
+    form.change('comment', '');
   };
-
-  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') {
-      addCommentAndClearInput();
-    }
-  };
-
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
-        onClose();
+        updateVisibleModal();
         break;
     }
   };
@@ -54,19 +45,34 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
     return () => document.removeEventListener('keydown', onKeydown);
   });
 
-  return !visible ? null : (
-    <ModalWindowWrapper onClick={onClose}>
+  const initialValues = { comment: 'New Comment' };
+
+  const onSubmit = (values: CommentName, form: CommentForm) => {
+    addCommentAndClear(values, form);
+  };
+
+  return (
+    <ModalWindowWrapper onClick={updateVisibleModal}>
       <ModalWindowContent onClick={(e) => e.stopPropagation()}>
-        <CommentInputWrapper>
-          <p>Ваш комментарий:</p>
-          <CommentInput
-            value={value}
-            onChange={(e) => setValue(() => e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <CommentButton onClick={addCommentAndClearInput}>+</CommentButton>
-        </CommentInputWrapper>
-        <CommentWindowCloseButton onClick={onClose}>X</CommentWindowCloseButton>
+        <Form
+          onSubmit={onSubmit}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <CommentInputWrapper onSubmit={handleSubmit}>
+                <p>Ваш комментарий:</p>
+                <Field
+                  name="comment"
+                  render={(props) => <CommentInput {...props.input} />}
+                />
+                <CommentButton type="submit">+</CommentButton>
+              </CommentInputWrapper>
+            );
+          }}
+        />
+        <CommentWindowCloseButton onClick={updateVisibleModal}>
+          X
+        </CommentWindowCloseButton>
         <CommentsList columnId={columnId} cardId={cardId} />
       </ModalWindowContent>
     </ModalWindowWrapper>
@@ -74,8 +80,9 @@ const CommentsWindow: FC<CommentsWindowProps> = ({
 };
 
 const ModalWindowWrapper = styled.div`
-  position: fixed;
-  z-index: 10;
+  position: absolute;
+  z-index: 14;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   top: 0;
@@ -106,7 +113,7 @@ const CommentWindowCloseButton = styled.button`
   cursor: pointer;
 `;
 
-const CommentInputWrapper = styled.div`
+const CommentInputWrapper = styled.form`
   display: flex;
   padding-top: 10px;
 `;
