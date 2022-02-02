@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 
 interface UiModalProps {
@@ -10,7 +11,9 @@ export const UiModal = function ({
   children,
   visibleModal,
 }: UiModalProps): JSX.Element | null {
-  return !visibleModal ? null : <ModalWrapper>{children}</ModalWrapper>;
+  return !visibleModal
+    ? null
+    : createPortal(<ModalWrapper>{children}</ModalWrapper>, document.body);
 };
 
 const ModalWrapper = styled.div`
