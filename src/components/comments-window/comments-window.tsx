@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -13,7 +13,11 @@ interface CommentsWindowProps extends Modal {
   cardId: string;
 }
 
-const CommentsWindow: FC<CommentsWindowProps> = ({ columnId, cardId, onClose }) => {
+const CommentsWindow = function ({
+  columnId,
+  cardId,
+  onClose,
+}: CommentsWindowProps): JSX.Element {
   const dispatch = useAppDispatch();
   const { addComment } = boardSlice.actions;
   const formRef = useRef<CommentForm>();

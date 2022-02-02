@@ -1,11 +1,15 @@
-import { FC } from 'react';
+import { ReactNode } from 'react';
 import styled from 'styled-components';
 
 interface UiModalProps {
+  children?: ReactNode;
   visibleModal: boolean;
 }
 
-export const UiModal: FC<UiModalProps> = ({ children, visibleModal }) => {
+export const UiModal = function ({
+  children,
+  visibleModal,
+}: UiModalProps): JSX.Element | null {
   return !visibleModal ? null : <ModalWrapper>{children}</ModalWrapper>;
 };
 

@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -11,7 +11,9 @@ interface ModalWindowProps {
   updateVisibleModal: (value: boolean) => void;
 }
 
-const ModalWindow: FC<ModalWindowProps> = ({ updateVisibleModal }) => {
+const ModalWindow = function ({
+  updateVisibleModal,
+}: ModalWindowProps): JSX.Element | null {
   const { user } = useAppSelector((state) => state.boardSlice);
   const { addUserName } = boardSlice.actions;
   const dispatch = useAppDispatch();

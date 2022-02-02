@@ -1,5 +1,3 @@
-import { FC } from 'react';
-
 import { selectorCards } from '../../store/ducks/board/selectors';
 import { useAppSelector } from '../../store/hooks/redux';
 import CardItem from '../card-item';
@@ -8,7 +6,7 @@ interface CardListProps {
   columnId: string;
 }
 
-const CardList: FC<CardListProps> = ({ columnId }) => {
+const CardList = function ({ columnId }: CardListProps): JSX.Element {
   const { cards } = useAppSelector(selectorCards(columnId));
 
   return (

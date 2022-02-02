@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import styled from 'styled-components';
 
 import { selectorComments } from '../../store/ducks/board/selectors';
@@ -9,7 +8,7 @@ interface CommentsListProps {
   cardId: string;
 }
 
-const CommentsList: FC<CommentsListProps> = ({ columnId, cardId }) => {
+const CommentsList = function ({ columnId, cardId }: CommentsListProps): JSX.Element {
   const { comments } = useAppSelector(selectorComments(columnId, cardId));
   return (
     <CommentsListWrapper>

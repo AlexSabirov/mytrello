@@ -1,4 +1,4 @@
-import { FC, KeyboardEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
+import { KeyboardEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -19,7 +19,7 @@ interface ColumnProps {
   column: Columns;
 }
 
-const ColumnItem: FC<ColumnProps> = ({ column }) => {
+const ColumnItem = function ({ column }: ColumnProps): JSX.Element {
   const { id: columnId } = column;
   const { updateColumn, removeColumn, addCard } = boardSlice.actions;
   const dispatch = useAppDispatch();

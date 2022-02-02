@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -14,7 +14,7 @@ interface CommentProps {
   comment: Comment;
 }
 
-const CommentItem: FC<CommentProps> = ({ columnId, cardId, comment }) => {
+const CommentItem = function ({ columnId, cardId, comment }: CommentProps): JSX.Element {
   const { id: commentId } = comment;
   const { visible, toggle } = useToggle(true);
   const { user } = useAppSelector((state) => state.boardSlice);

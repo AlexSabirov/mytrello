@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -16,7 +16,7 @@ interface CardItemProps {
   card: Card;
 }
 
-const CardItem: FC<CardItemProps> = ({ columnId, cardId, card }) => {
+const CardItem = function ({ columnId, cardId, card }: CardItemProps): JSX.Element {
   const onOpen = () => updateVisibleModal(true);
   const onClose = () => updateVisibleModal(false);
   const { updateCard, removeCard } = boardSlice.actions;

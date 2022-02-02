@@ -1,11 +1,10 @@
-import { FC } from 'react';
 import styled from 'styled-components';
 
 import { selectorColumns } from '../../store/ducks/board/selectors';
 import { useAppSelector } from '../../store/hooks/redux';
 import ColumnItem from '../column-item';
 
-const ColumnList: FC = () => {
+const ColumnList = function (): JSX.Element {
   const { columns } = useAppSelector(selectorColumns);
   return (
     <ColumnListWrapper>
