@@ -1,9 +1,10 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { boardSlice } from '../../store/ducks/board/';
 import { useAppDispatch, useAppSelector } from '../../store/hooks/redux';
+import { useToggle } from '../../store/hooks/useToggle';
 import ColumnList from '../column-list';
 import ModalWindow from '../modal';
 import UiModal from '../ui-modal';
@@ -15,11 +16,11 @@ const BoardItem = function (): JSX.Element {
   const { addColumn } = boardSlice.actions;
   const dispatch = useAppDispatch();
 
-  const [visibleModal, setVisibleModal] = useState(() => user === '');
+  const { visible, toggle } = useToggle(user === '');
 
-  const updateVisibleModal = useCallback((value: boolean) => {
-    setVisibleModal(value);
-  }, []);
+  const updateVisibleModal = useCallback(() => {
+    toggle();
+  }, [toggle]);
 
   const addColumnFunction = useCallback(
     (values) => {
@@ -60,8 +61,8 @@ const BoardItem = function (): JSX.Element {
           }}
         />
       </BoardWrapper>
-      <UiModal visibleModal={visibleModal}>
-        <ModalWindow updateVisibleModal={updateVisibleModal} />
+      <UiModal visibleModal={visible}>
+        <ModalWindow updateVisibleModal={updateVisibleModal} visibleModal={visible} />
       </UiModal>
     </>
   );

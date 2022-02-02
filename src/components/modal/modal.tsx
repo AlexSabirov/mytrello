@@ -4,23 +4,21 @@ import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { boardSlice } from '../../store/ducks/board/';
-import { useAppDispatch, useAppSelector } from '../../store/hooks/redux';
-import { useToggle } from '../../store/hooks/useToggle';
+import { useAppDispatch } from '../../store/hooks/redux';
 import { initialValues, UserName } from './form-values';
 
 interface ModalWindowProps {
+  visibleModal: boolean;
   updateVisibleModal: (value: boolean) => void;
 }
 
 const ModalWindow = function ({
+  visibleModal,
   updateVisibleModal,
 }: ModalWindowProps): JSX.Element | null {
-  const { user } = useAppSelector((state) => state.boardSlice);
   const { addUserName } = boardSlice.actions;
   const dispatch = useAppDispatch();
   const formRef = useRef<FormApi<UserName, Partial<UserName>>>();
-
-  const { visible } = useToggle(user === '');
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -43,7 +41,7 @@ const ModalWindow = function ({
   );
 
   const onClose = () => {
-    updateVisibleModal(!visible);
+    updateVisibleModal(!visibleModal);
   };
 
   const addUserNameAndClose = (values: UserName) => {
@@ -55,7 +53,7 @@ const ModalWindow = function ({
     addUserNameAndClose(values);
   };
 
-  return !visible ? null : (
+  return !visibleModal ? null : (
     <ModalWrapper onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <Form
