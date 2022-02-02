@@ -16,7 +16,7 @@ interface CommentsWindowProps extends Modal {
 const CommentsWindow = function ({
   columnId,
   cardId,
-  onClose,
+  updateVisibleModal,
 }: CommentsWindowProps): JSX.Element {
   const dispatch = useAppDispatch();
   const { addComment } = boardSlice.actions;
@@ -35,7 +35,7 @@ const CommentsWindow = function ({
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
-        onClose();
+        updateVisibleModal();
         break;
     }
   };
@@ -52,7 +52,7 @@ const CommentsWindow = function ({
   };
 
   return (
-    <ModalWindowWrapper onClick={onClose}>
+    <ModalWindowWrapper onClick={updateVisibleModal}>
       <ModalWindowContent onClick={(e) => e.stopPropagation()}>
         <Form
           onSubmit={onSubmit}
@@ -70,7 +70,9 @@ const CommentsWindow = function ({
             );
           }}
         />
-        <CommentWindowCloseButton onClick={onClose}>X</CommentWindowCloseButton>
+        <CommentWindowCloseButton onClick={updateVisibleModal}>
+          X
+        </CommentWindowCloseButton>
         <CommentsList columnId={columnId} cardId={cardId} />
       </ModalWindowContent>
     </ModalWindowWrapper>
@@ -83,7 +85,6 @@ const ModalWindowWrapper = styled.div`
   overflow: hidden;
   width: 100%;
   height: 100%;
-  opacity: 0.7;
   top: 0;
   left: 0;
   background-color: rgba(255, 255, 255, 0.6);

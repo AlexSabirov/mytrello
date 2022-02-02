@@ -21,5 +21,5 @@ export interface Comment {
 }
 
 export interface Modal {
-  onClose: () => void;
+  updateVisibleModal: () => void;
 }

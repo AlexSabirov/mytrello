@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
@@ -17,17 +17,15 @@ interface CardItemProps {
 }
 
 const CardItem = function ({ columnId, cardId, card }: CardItemProps): JSX.Element {
-  const onOpen = () => updateVisibleModal(true);
-  const onClose = () => updateVisibleModal(false);
   const { updateCard, removeCard } = boardSlice.actions;
   const dispatch = useAppDispatch();
   const formRef = useRef<CardForm>();
   const { visible, toggle, close } = useToggle(true);
-  const [visibleModal, setVisibleModal] = useState(false);
+  const visibleModal = useToggle(false);
 
-  const updateVisibleModal = useCallback((value: boolean) => {
-    setVisibleModal(value);
-  }, []);
+  const updateVisibleModal = useCallback(() => {
+    visibleModal.toggle();
+  }, [visibleModal]);
 
   const updateCardFunction = useCallback(
     (values: CardUpdate) => {
@@ -55,7 +53,7 @@ const CardItem = function ({ columnId, cardId, card }: CardItemProps): JSX.Eleme
     <CardWrapper>
       {visible ? (
         <CardItemWrapper>
-          <CardItemTitle onClick={onOpen}>{card.title}</CardItemTitle>
+          <CardItemTitle onClick={updateVisibleModal}>{card.title}</CardItemTitle>
           <CardItemButtons>
             <button onClick={toggle}>Edit</button>
             <button onClick={removeCardFunction}>Del</button>
@@ -79,8 +77,12 @@ const CardItem = function ({ columnId, cardId, card }: CardItemProps): JSX.Eleme
           }}
         />
       )}
-      <UiModal visibleModal={visibleModal}>
-        <CommentsWindow onClose={onClose} columnId={columnId} cardId={cardId} />
+      <UiModal visibleModal={visibleModal.visible}>
+        <CommentsWindow
+          updateVisibleModal={updateVisibleModal}
+          columnId={columnId}
+          cardId={cardId}
+        />
       </UiModal>
     </CardWrapper>
   );

@@ -1,10 +1,11 @@
 import { FormApi } from 'final-form';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Field, Form } from 'react-final-form';
 import styled from 'styled-components';
 
 import { boardSlice } from '../../store/ducks/board/';
 import { useAppDispatch, useAppSelector } from '../../store/hooks/redux';
+import { useToggle } from '../../store/hooks/useToggle';
 import { initialValues, UserName } from './form-values';
 
 interface ModalWindowProps {
@@ -19,7 +20,7 @@ const ModalWindow = function ({
   const dispatch = useAppDispatch();
   const formRef = useRef<FormApi<UserName, Partial<UserName>>>();
 
-  const [visible, setModal] = useState(() => user === '');
+  const { visible } = useToggle(user === '');
 
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -43,7 +44,6 @@ const ModalWindow = function ({
 
   const onClose = () => {
     updateVisibleModal(!visible);
-    setModal(false);
   };
 
   const addUserNameAndClose = (values: UserName) => {
@@ -56,30 +56,32 @@ const ModalWindow = function ({
   };
 
   return !visible ? null : (
-    <ModalContent>
-      <Form
-        onSubmit={onSubmit}
-        initialValues={initialValues}
-        render={({ form, handleSubmit }) => {
-          formRef.current = form;
-          return (
-            <form onSubmit={handleSubmit}>
-              <label>Введите ваше имя:</label>
-              <InputWrapper>
-                <Field
-                  name="user"
-                  placeholder="Введите имя"
-                  type="text"
-                  render={(props) => <input {...props.input} />}
-                />
-                <ButtonAccept type="submit">Принять</ButtonAccept>
-                <ModalClose onClick={onClose}>X</ModalClose>
-              </InputWrapper>
-            </form>
-          );
-        }}
-      />
-    </ModalContent>
+    <ModalWrapper onClick={onClose}>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
+        <Form
+          onSubmit={onSubmit}
+          initialValues={initialValues}
+          render={({ form, handleSubmit }) => {
+            formRef.current = form;
+            return (
+              <form onSubmit={handleSubmit}>
+                <label>Введите ваше имя:</label>
+                <InputWrapper>
+                  <Field
+                    name="user"
+                    placeholder="Введите имя"
+                    type="text"
+                    render={(props) => <input {...props.input} />}
+                  />
+                  <ButtonAccept type="submit">Принять</ButtonAccept>
+                  <ModalClose onClick={onClose}>X</ModalClose>
+                </InputWrapper>
+              </form>
+            );
+          }}
+        />
+      </ModalContent>
+    </ModalWrapper>
   );
 };
 
@@ -110,6 +112,20 @@ const ModalContent = styled.div`
   border-radius: 3px;
   display: flex;
   flex-direction: column;
+`;
+
+const ModalWrapper = styled.div`
+  position: absolute;
+  z-index: 14;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 export { ModalWindow };
